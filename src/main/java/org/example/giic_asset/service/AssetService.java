@@ -21,7 +21,6 @@ import org.example.giic_asset.repository.NotificationRepository;
 import org.example.giic_asset.repository.TransferRepository;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -106,10 +105,7 @@ public class AssetService {
     public Page<AssetResponse> getAssetList(Pageable pageable, AssetSearchCriteria criteria) {
         log.debug("AssetService.getAssets() called");
 
-        if (pageable.getSort().isUnsorted()) {
-            pageable = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(),
-                    Sort.by(Sort.Direction.DESC, "createdAt"));
-        }
+        pageable = AssetPageSort.stable(pageable, Sort.by(Sort.Direction.DESC, "createdAt"));
 
         // Before query
         long count = assetRepository.count();

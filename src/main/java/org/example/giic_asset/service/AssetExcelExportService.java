@@ -21,7 +21,6 @@ import org.example.giic_asset.entity.enums.AssetStatus;
 import org.example.giic_asset.repository.AssetRepository;
 import org.example.giic_asset.repository.AssetSpecifications;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -43,9 +42,7 @@ public class AssetExcelExportService {
 
     @Transactional(readOnly = true)
     public Page<AssetResponse> preview(AssetSearchCriteria criteria, Pageable pageable) {
-        Pageable previewPageable = pageable.getSort().isSorted()
-                ? pageable
-                : PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), Sort.by("assetNo").ascending());
+        Pageable previewPageable = AssetPageSort.stable(pageable, Sort.by("assetNo").ascending());
 
         return assetRepository.findAll(AssetSpecifications.withCriteria(criteria), previewPageable)
                 .map(asset -> AssetResponse.from(asset, List.of()));

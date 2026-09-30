@@ -8,6 +8,7 @@ import org.example.giic_asset.entity.enums.AssetStatus;
 import org.example.giic_asset.repository.AssetRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -24,6 +25,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
 class AssetExcelExportServiceTest {
@@ -96,6 +98,20 @@ class AssetExcelExportServiceTest {
         assertThat(result.getContent()).hasSize(1);
         assertThat(result.getContent().get(0).getAssetNo()).isEqualTo("2411309");
         assertThat(result.getContent().get(0).getImages()).isEmpty();
+    }
+
+    @Test
+    void previewAddsUniqueTieBreakerToRequestedDateSort() {
+        PageRequest requested = PageRequest.of(1, 20, Sort.by(Sort.Direction.DESC, "createdAt"));
+        when(assetRepository.findAll(anySpecification(), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(List.of(), requested, 0));
+
+        assetExcelExportService.preview(AssetSearchCriteria.empty(), requested);
+
+        ArgumentCaptor<Pageable> captor = ArgumentCaptor.forClass(Pageable.class);
+        verify(assetRepository).findAll(anySpecification(), captor.capture());
+        assertThat(captor.getValue().getSort().toList()).containsExactly(
+                Sort.Order.desc("createdAt"), Sort.Order.desc("id"));
     }
 
     @Test
