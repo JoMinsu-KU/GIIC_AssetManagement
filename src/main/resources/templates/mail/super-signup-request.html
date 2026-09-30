@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>신규 회원가입 승인 요청</title>
+    <th:block th:replace="~{mail/fragments :: styles}"></th:block>
+</head>
+<body style="margin:0;padding:0;background-color:#eef2f7;color:#17233b;font-family:Arial,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;">
+<table class="mail-wrap" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#eef2f7" style="width:100%;border-collapse:collapse;border-spacing:0;background-color:#eef2f7;">
+    <tr><td class="mail-space" height="32" style="height:32px;font-size:0;line-height:0;">&nbsp;</td></tr>
+    <tr>
+        <td align="center">
+            <table class="mail-card" role="presentation" width="640" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="width:640px;max-width:640px;border:1px solid #dce3ec;border-collapse:separate;border-spacing:0;border-radius:14px;background-color:#ffffff;overflow:hidden;">
+                <th:block th:replace="~{mail/fragments :: header('SUPER ADMIN NOTIFICATION')}"></th:block>
+                <tr>
+                    <td class="mail-body" style="padding:42px 38px 36px;background-color:#ffffff;font-family:Arial,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;">
+                        <span class="status status-navy" style="display:inline-block;margin:0 0 18px;padding:7px 11px;border-radius:999px;background-color:#eaf0fb;color:#223f87;font-size:12px;font-weight:800;line-height:1.4;">승인 요청</span>
+                        <h1 class="mail-title" style="margin:0;color:#17233b;font-size:27px;font-weight:800;line-height:1.35;letter-spacing:-0.5px;">새로운 회원가입 요청이<br>도착했습니다.</h1>
+                        <p class="mail-copy" style="margin:16px 0 0;color:#647188;font-size:15px;line-height:1.75;">
+                            슈퍼관리자의 확인이 필요한 신규 가입 요청입니다.<br>
+                            아래 신청자 정보를 확인한 뒤 사용자 관리에서 승인 또는 반려해 주세요.
+                        </p>
+                        <table class="info-card" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f9fbfd" style="width:100%;margin-top:28px;border:1px solid #e2e8f1;border-collapse:separate;border-spacing:0;border-radius:10px;background-color:#f9fbfd;">
+                            <tr><td class="info-label" width="116" style="width:116px;padding:12px 16px;border-bottom:1px solid #e8edf4;color:#7c899d;font-size:13px;font-weight:700;line-height:1.5;">신청자</td><td class="info-value" style="padding:12px 16px;border-bottom:1px solid #e8edf4;color:#263652;font-size:13px;font-weight:700;line-height:1.5;" th:text="${name}">-</td></tr>
+                            <tr><td class="info-label" width="116" style="width:116px;padding:12px 16px;border-bottom:1px solid #e8edf4;color:#7c899d;font-size:13px;font-weight:700;line-height:1.5;">사번</td><td class="info-value" style="padding:12px 16px;border-bottom:1px solid #e8edf4;color:#263652;font-size:13px;font-weight:700;line-height:1.5;" th:text="${employeeNo}">-</td></tr>
+                            <tr><td class="info-label" width="116" style="width:116px;padding:12px 16px;border-bottom:1px solid #e8edf4;color:#7c899d;font-size:13px;font-weight:700;line-height:1.5;">부서</td><td class="info-value" style="padding:12px 16px;border-bottom:1px solid #e8edf4;color:#263652;font-size:13px;font-weight:700;line-height:1.5;" th:text="${department}">-</td></tr>
+                            <tr><td class="info-label" width="116" style="width:116px;padding:12px 16px;border-bottom:1px solid #e8edf4;color:#7c899d;font-size:13px;font-weight:700;line-height:1.5;">이메일</td><td class="info-value" style="padding:12px 16px;border-bottom:1px solid #e8edf4;color:#263652;font-size:13px;font-weight:700;line-height:1.5;word-break:break-all;" th:text="${email}">-</td></tr>
+                            <tr><td class="info-label" width="116" style="width:116px;padding:12px 16px;color:#7c899d;font-size:13px;font-weight:700;line-height:1.5;">요청일시</td><td class="info-value" style="padding:12px 16px;color:#263652;font-size:13px;font-weight:700;line-height:1.5;" th:text="${formattedDate}">-</td></tr>
+                        </table>
+                        <div class="action-wrap" style="margin-top:28px;">
+                            <a class="action-button" style="display:inline-block;padding:13px 22px;border-radius:9px;background-color:#496fe8;color:#ffffff;font-size:14px;font-weight:800;line-height:1.4;text-decoration:none;" th:href="${reviewUrl}" href="http://localhost:3000/users?status=PENDING">가입 요청 검토하기</a>
+                        </div>
+                        <div class="notice" style="margin-top:22px;padding:14px 16px;border-left:3px solid #b8c7e8;background-color:#f7f9fc;color:#69768a;font-size:12px;line-height:1.65;">보안을 위해 메일에서 직접 승인하지 않습니다. 버튼을 누른 뒤 시스템에 로그인하여 최종 처리해 주세요.</div>
+                    </td>
+                </tr>
+                <th:block th:replace="~{mail/fragments :: footer('이 메일은 승인된 슈퍼관리자 계정의 등록 이메일에만 발송됩니다.')}"></th:block>
+            </table>
+        </td>
+    </tr>
+    <tr><td class="mail-space" height="32" style="height:32px;font-size:0;line-height:0;">&nbsp;</td></tr>
+</table>
+</body>
+</html>

@@ -1,0 +1,1130 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GIIC 자산 등록 다중 이미지 목업</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --surface: #ffffff;
+      --surface-soft: #f8faff;
+      --line: #e3e9f2;
+      --line-strong: #d3ddea;
+      --text: #19253b;
+      --muted: #708098;
+      --blue: #3e7af5;
+      --violet: #7659f5;
+      --blue-soft: #edf4ff;
+      --green: #178657;
+      --green-soft: #e5f8ee;
+      --red: #d84949;
+      --red-soft: #fff0f0;
+      --shadow: 0 10px 28px rgba(27, 42, 68, 0.065);
+      --radius-lg: 20px;
+      --radius-md: 15px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      color: var(--text);
+      background: var(--bg);
+      font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+    }
+
+    button,
+    input,
+    select { font: inherit; }
+    button { cursor: pointer; }
+
+    .topbar {
+      height: 76px;
+      padding: 0 34px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 24px;
+      background: rgba(255, 255, 255, 0.97);
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 3px 12px rgba(31, 45, 70, 0.04);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      color: #fff;
+      border-radius: 11px;
+      background: linear-gradient(135deg, var(--blue), var(--violet));
+      font-size: 13px;
+      font-weight: 900;
+      letter-spacing: -0.05em;
+    }
+
+    .brand-copy strong {
+      display: block;
+      font-size: 17px;
+      letter-spacing: -0.025em;
+      white-space: nowrap;
+    }
+
+    .brand-copy span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .nav a {
+      padding: 11px 14px;
+      color: #42516a;
+      border-radius: 11px;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav a.active {
+      color: #255bd3;
+      background: var(--blue-soft);
+    }
+
+    .user-area {
+      justify-self: end;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #34425a;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .role {
+      padding: 5px 9px;
+      color: #69778d;
+      border-radius: 999px;
+      background: #f0f2f6;
+      font-size: 11px;
+    }
+
+    .page {
+      width: min(1420px, calc(100% - 52px));
+      margin: 0 auto;
+      padding: 34px 0 54px;
+    }
+
+    .page-header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 22px;
+    }
+
+    .overline {
+      margin: 0 0 9px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.09em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 32px;
+      line-height: 1.2;
+      letter-spacing: -0.04em;
+    }
+
+    .subtitle {
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+      gap: 9px;
+    }
+
+    .btn {
+      min-height: 43px;
+      padding: 0 16px;
+      color: #506078;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      transition: transform 150ms ease, box-shadow 150ms ease, border-color 150ms ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: #bdc9dc;
+      box-shadow: 0 5px 12px rgba(35, 52, 82, 0.07);
+    }
+
+    .btn.primary {
+      color: #fff;
+      border-color: transparent;
+      background: linear-gradient(100deg, var(--blue), var(--violet));
+      box-shadow: 0 8px 17px rgba(72, 103, 239, 0.2);
+    }
+
+    .btn.small {
+      min-height: 35px;
+      padding: 0 12px;
+      border-radius: 10px;
+      font-size: 12px;
+    }
+
+    .btn[hidden] { display: none; }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 300px;
+      gap: 18px;
+      align-items: start;
+    }
+
+    .main-stack,
+    .aside {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      min-width: 0;
+    }
+
+    .aside {
+      position: sticky;
+      top: 20px;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid rgba(225, 232, 242, 0.96);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .image-card,
+    .form-card,
+    .side-card { padding: 24px 26px; }
+
+    .section-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+    }
+
+    .section-head h2,
+    .section-head h3 {
+      margin: 0;
+      font-size: 20px;
+      letter-spacing: -0.025em;
+    }
+
+    .section-head p {
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.55;
+    }
+
+    .image-total {
+      flex: 0 0 auto;
+      padding: 7px 10px;
+      color: #36547f;
+      border-radius: 9px;
+      background: #f0f5fc;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .image-workspace {
+      display: grid;
+      grid-template-columns: minmax(390px, 0.92fr) minmax(0, 1.08fr);
+      gap: 16px;
+    }
+
+    .image-step {
+      min-width: 0;
+      padding: 18px;
+      border: 1px solid #e3eaf4;
+      border-radius: 17px;
+      background: var(--surface-soft);
+    }
+
+    .step-head {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 14px;
+    }
+
+    .step-title {
+      display: flex;
+      align-items: center;
+      gap: 9px;
+    }
+
+    .step-number {
+      width: 25px;
+      height: 25px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      color: #fff;
+      border-radius: 8px;
+      background: #486fe8;
+      font-size: 11px;
+      font-weight: 900;
+    }
+
+    .step-title strong {
+      font-size: 15px;
+      letter-spacing: -0.015em;
+    }
+
+    .optional {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    .ocr-preview {
+      position: relative;
+      height: 270px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border: 1px solid #dde5f0;
+      border-radius: 14px;
+      background: #f1f4f8;
+    }
+
+    .ocr-preview img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+    }
+
+    .image-badges {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .badge {
+      padding: 5px 8px;
+      color: #fff;
+      border-radius: 7px;
+      background: rgba(28, 43, 68, 0.82);
+      font-size: 10px;
+      font-weight: 800;
+      backdrop-filter: blur(4px);
+    }
+
+    .badge.primary-badge { background: rgba(53, 105, 226, 0.92); }
+
+    .ocr-empty {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      padding: 24px;
+      color: var(--muted);
+      text-align: center;
+      font-size: 12px;
+      line-height: 1.6;
+    }
+
+    .ocr-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 12px;
+    }
+
+    .ocr-status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      min-width: 0;
+      color: var(--green);
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .ocr-status::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      flex: 0 0 auto;
+      border-radius: 50%;
+      background: currentColor;
+    }
+
+    .ocr-status.pending { color: #9a6a24; }
+
+    .control-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      flex: 0 0 auto;
+    }
+
+    .photo-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .photo-item,
+    .photo-add {
+      position: relative;
+      min-width: 0;
+      height: 148px;
+      overflow: hidden;
+      border: 1px solid #dfe7f1;
+      border-radius: 13px;
+      background: #f2f5f8;
+    }
+
+    .photo-item img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .photo-item.primary-image {
+      border: 2px solid var(--blue);
+      box-shadow: 0 0 0 2px rgba(62, 122, 245, 0.1);
+    }
+
+    .photo-delete {
+      position: absolute;
+      top: 8px;
+      right: 8px;
+      width: 27px;
+      height: 27px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      color: #fff;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      background: rgba(190, 48, 48, 0.92);
+      font-size: 16px;
+      line-height: 1;
+      box-shadow: 0 3px 8px rgba(90, 26, 26, 0.2);
+    }
+
+    .photo-footer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      min-height: 42px;
+      padding: 7px 9px;
+      color: #fff;
+      background: linear-gradient(180deg, transparent 0%, rgba(20, 31, 48, 0.82) 48%);
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .set-primary {
+      padding: 5px 7px;
+      color: #294c8e;
+      border: 0;
+      border-radius: 7px;
+      background: rgba(255, 255, 255, 0.94);
+      font-size: 9px;
+      font-weight: 900;
+      white-space: nowrap;
+    }
+
+    .photo-add {
+      display: grid;
+      place-items: center;
+      color: #52709d;
+      border: 1.5px dashed #adbbcf;
+      background: #fbfdff;
+    }
+
+    .photo-add span {
+      display: grid;
+      gap: 7px;
+      text-align: center;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .photo-add b {
+      font-size: 27px;
+      font-weight: 400;
+      line-height: 1;
+    }
+
+    .image-help {
+      margin: 14px 0 0;
+      padding-top: 13px;
+      color: var(--muted);
+      border-top: 1px solid #e5ebf3;
+      font-size: 11px;
+      line-height: 1.65;
+    }
+
+    .form-card { padding-bottom: 26px; }
+
+    .form-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .form-head h3 {
+      margin: 0;
+      font-size: 19px;
+      letter-spacing: -0.025em;
+    }
+
+    .form-head span {
+      color: var(--muted);
+      font-size: 12px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 17px 14px;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      min-width: 0;
+    }
+
+    .field.full { grid-column: 1 / -1; }
+    .field.span-two { grid-column: span 2; }
+
+    .field label {
+      min-height: 18px;
+      color: #40506a;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .required { margin-left: 3px; color: #e95757; }
+
+    .ai-badge {
+      margin-left: 6px;
+      padding: 3px 6px;
+      color: #3464d5;
+      border-radius: 6px;
+      background: var(--blue-soft);
+      font-size: 9px;
+      font-weight: 900;
+      vertical-align: 1px;
+    }
+
+    .input,
+    .select {
+      width: 100%;
+      height: 47px;
+      padding: 0 13px;
+      color: var(--text);
+      border: 1px solid #d6dfeb;
+      border-radius: 12px;
+      outline: none;
+      background: #fbfcfe;
+      font-size: 13px;
+    }
+
+    .input:focus,
+    .select:focus {
+      border-color: #6683ee;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(80, 116, 237, 0.11);
+    }
+
+    .input.auto-filled {
+      border-color: #c8d8fd;
+      background: #f6f9ff;
+    }
+
+    .side-card h3 {
+      margin: 0 0 15px;
+      font-size: 17px;
+      letter-spacing: -0.02em;
+    }
+
+    .check-list { display: grid; }
+
+    .check-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-top: 1px solid #edf1f6;
+      font-size: 12px;
+    }
+
+    .check-row:first-child { border-top: 0; }
+    .check-row span { color: var(--muted); }
+    .check-row strong { text-align: right; }
+    .check-row strong.good { color: var(--green); }
+
+    .guide-list {
+      display: grid;
+      gap: 9px;
+    }
+
+    .guide-item {
+      padding: 12px 13px;
+      border: 1px solid #e7edf5;
+      border-radius: 13px;
+      background: var(--surface-soft);
+    }
+
+    .guide-item strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 12px;
+    }
+
+    .guide-item span {
+      color: var(--muted);
+      font-size: 11px;
+      line-height: 1.55;
+    }
+
+    .submit-bar {
+      position: sticky;
+      bottom: 14px;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      padding: 13px 16px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: rgba(255, 255, 255, 0.93);
+      box-shadow: 0 12px 30px rgba(22, 37, 62, 0.1);
+      backdrop-filter: blur(12px);
+    }
+
+    .submit-copy {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.55;
+    }
+
+    .submit-actions {
+      display: flex;
+      gap: 8px;
+      flex: 0 0 auto;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 26px;
+      z-index: 80;
+      max-width: calc(100% - 32px);
+      padding: 12px 17px;
+      color: #fff;
+      border-radius: 11px;
+      background: rgba(28, 40, 61, 0.95);
+      box-shadow: 0 8px 24px rgba(16, 26, 42, 0.2);
+      opacity: 0;
+      transform: translate(-50%, 12px);
+      transition: 180ms ease;
+      pointer-events: none;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    @media (max-width: 1180px) {
+      .topbar { grid-template-columns: 1fr auto; }
+      .nav { display: none; }
+      .layout { grid-template-columns: 1fr; }
+      .aside {
+        position: static;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    @media (max-width: 880px) {
+      .page { width: min(100% - 28px, 1420px); padding-top: 24px; }
+      .page-header { flex-direction: column; }
+      .actions { justify-content: flex-start; }
+      .image-workspace { grid-template-columns: 1fr; }
+      .form-grid { grid-template-columns: 1fr 1fr; }
+      .field.span-two { grid-column: 1 / -1; }
+    }
+
+    @media (max-width: 620px) {
+      .topbar { height: 66px; padding: 0 18px; }
+      .brand-copy span,
+      .role,
+      .user-area { display: none; }
+      .topbar { grid-template-columns: 1fr; }
+      h1 { font-size: 28px; }
+      .image-card,
+      .form-card,
+      .side-card { padding: 20px; }
+      .photo-grid,
+      .form-grid,
+      .aside { grid-template-columns: 1fr; }
+      .field.full,
+      .field.span-two { grid-column: auto; }
+      .ocr-preview { height: 230px; }
+      .photo-item,
+      .photo-add { height: 180px; }
+      .submit-bar { align-items: stretch; flex-direction: column; }
+      .submit-actions .btn { flex: 1; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">GIIC</div>
+      <div class="brand-copy">
+        <strong>경남지능화혁신사업단</strong>
+        <span>Gyeongnam Intelligence Innovation Center</span>
+      </div>
+    </div>
+    <nav class="nav" aria-label="주 메뉴">
+      <a href="#">대시보드</a>
+      <a class="active" href="#">자산 관리</a>
+      <a href="#">유지보수</a>
+      <a href="#">사용자 관리</a>
+      <a href="#">시스템 설정</a>
+    </nav>
+    <div class="user-area">
+      <span>조민수</span>
+      <span class="role">슈퍼관리자</span>
+    </div>
+  </header>
+
+  <main class="page">
+    <header class="page-header">
+      <div>
+        <p class="overline">Asset Create</p>
+        <h1>자산 등록</h1>
+        <p class="subtitle">OCR로 기본 정보를 채우고, 자산 상태를 확인할 수 있는 추가 사진을 함께 등록합니다.</p>
+      </div>
+      <div class="actions">
+        <button class="btn">취소</button>
+        <button class="btn primary" id="topSubmit">등록</button>
+      </div>
+    </header>
+
+    <div class="layout">
+      <div class="main-stack">
+        <section class="card image-card">
+          <div class="section-head">
+            <div>
+              <h2>자산 이미지</h2>
+              <p>OCR 대상과 추가 사진의 역할을 분리했습니다. 추가 사진 등록은 선택 사항입니다.</p>
+            </div>
+            <span class="image-total" id="imageTotal">2 / 5장</span>
+          </div>
+
+          <div class="image-workspace">
+            <section class="image-step">
+              <div class="step-head">
+                <div class="step-title">
+                  <span class="step-number">1</span>
+                  <strong>OCR 대상 이미지</strong>
+                </div>
+                <span class="optional">1장</span>
+              </div>
+
+              <div class="ocr-preview" id="ocrPreview">
+                <img id="ocrImage" src="uploads/2502196_bd2cbf3c11a0b861.jpg" alt="OCR 대상 자산 라벨" />
+                <div class="image-badges" id="ocrBadges">
+                  <span class="badge">OCR 대상</span>
+                  <span class="badge primary-badge">대표</span>
+                </div>
+              </div>
+
+              <div class="ocr-controls">
+                <span class="ocr-status" id="ocrStatus">5개 항목 추출 완료</span>
+                <div class="control-buttons">
+                  <button class="btn small" id="ocrSetPrimary" hidden>대표로 지정</button>
+                  <button class="btn small" id="ocrReplace">이미지 교체</button>
+                  <button class="btn small primary" id="ocrRun">다시 추출</button>
+                </div>
+              </div>
+              <input id="ocrInput" type="file" accept="image/*" hidden />
+            </section>
+
+            <section class="image-step">
+              <div class="step-head">
+                <div class="step-title">
+                  <span class="step-number">2</span>
+                  <strong>추가 사진</strong>
+                </div>
+                <span class="optional" id="additionalCount">1 / 4장 · 선택</span>
+              </div>
+
+              <div class="photo-grid" id="photoGrid"></div>
+              <p class="image-help">자산 전체 모습, 라벨 위치, 설치 환경 등을 추가할 수 있습니다. JPG, PNG, WEBP 파일을 지원합니다.</p>
+              <input id="additionalInput" type="file" accept="image/*" multiple hidden />
+            </section>
+          </div>
+        </section>
+
+        <section class="card form-card">
+          <div class="form-head">
+            <h3>기본 정보</h3>
+            <span>OCR 결과가 들어온 필드는 직접 수정할 수 있습니다.</span>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label>자산번호 <span class="required">*</span><span class="ai-badge">AI 입력</span></label>
+              <input class="input auto-filled" id="assetNo" value="2502196" />
+            </div>
+            <div class="field">
+              <label>물품명 <span class="required">*</span><span class="ai-badge">AI 입력</span></label>
+              <input class="input auto-filled" id="assetName" value="데스크톱컴퓨터" />
+            </div>
+            <div class="field">
+              <label>모델명 <span class="required">*</span></label>
+              <input class="input" value="조립식컴퓨터" />
+            </div>
+            <div class="field full">
+              <label>규격 <span class="ai-badge">AI 입력</span></label>
+              <input class="input auto-filled" id="assetSpec" value="230×475×465(mm)" />
+            </div>
+          </div>
+        </section>
+
+        <section class="card form-card">
+          <div class="form-head">
+            <h3>재무 · 관리 정보</h3>
+            <span>회계와 실제 운영 위치에 필요한 정보입니다.</span>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label>취득금액</label>
+              <input class="input" type="number" value="1250000" />
+            </div>
+            <div class="field">
+              <label>취득일자 <span class="required">*</span><span class="ai-badge">AI 입력</span></label>
+              <input class="input auto-filled" id="purchaseDate" type="date" value="2025-12-22" />
+            </div>
+            <div class="field">
+              <label>상태</label>
+              <select class="select"><option>정상</option><option>수리 중</option><option>폐기</option><option>손망</option></select>
+            </div>
+            <div class="field">
+              <label>관리부서 <span class="required">*</span><span class="ai-badge">AI 입력</span></label>
+              <input class="input auto-filled" id="managingDept" value="경남지능화혁신사업단" />
+            </div>
+            <div class="field span-two">
+              <label>비치장소</label>
+              <input class="input" value="제조DX혁신연구실(한마관 지상3층)" />
+            </div>
+          </div>
+        </section>
+
+        <section class="card form-card">
+          <div class="form-head">
+            <h3>실사용자 정보</h3>
+            <span>배정 전 자산은 비워둔 상태로 등록할 수 있습니다.</span>
+          </div>
+          <div class="form-grid">
+            <div class="field"><label>사용자 이름</label><input class="input" placeholder="이름 입력" /></div>
+            <div class="field"><label>사용자 부서</label><input class="input" placeholder="부서 입력" /></div>
+            <div class="field"><label>연락처</label><input class="input" placeholder="연락처 입력" /></div>
+          </div>
+        </section>
+
+        <div class="submit-bar">
+          <div class="submit-copy">필수 정보와 대표 이미지를 확인한 뒤 등록해 주세요. 추가 사진은 등록 후에도 수정할 수 있습니다.</div>
+          <div class="submit-actions">
+            <button class="btn">취소</button>
+            <button class="btn primary" id="bottomSubmit">자산 등록</button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="aside">
+        <section class="card side-card">
+          <h3>등록 전 확인</h3>
+          <div class="check-list">
+            <div class="check-row"><span>OCR 상태</span><strong class="good" id="summaryOcr">추출 완료</strong></div>
+            <div class="check-row"><span>전체 이미지</span><strong id="summaryImages">2장</strong></div>
+            <div class="check-row"><span>대표 이미지</span><strong id="summaryPrimary">OCR 대상</strong></div>
+            <div class="check-row"><span>추가 사진</span><strong id="summaryAdditional">1장</strong></div>
+            <div class="check-row"><span>기본 상태</span><strong>정상</strong></div>
+          </div>
+        </section>
+
+        <section class="card side-card">
+          <h3>이미지 등록 안내</h3>
+          <div class="guide-list">
+            <div class="guide-item"><strong>OCR 이미지는 한 장</strong><span>라벨이 선명한 사진을 사용하면 자동 입력 정확도가 높아집니다.</span></div>
+            <div class="guide-item"><strong>추가 사진은 선택</strong><span>필요한 경우에만 최대 4장까지 등록할 수 있습니다.</span></div>
+            <div class="guide-item"><strong>대표 사진 선택</strong><span>목록과 상세 화면에서 가장 먼저 보여줄 사진을 지정합니다.</span></div>
+          </div>
+        </section>
+      </aside>
+    </div>
+  </main>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    let ocrImage = {
+      src: "uploads/2502196_bd2cbf3c11a0b861.jpg",
+      name: "자산 라벨 사진",
+      primary: true
+    };
+
+    let additionalImages = [
+      {
+        id: 1,
+        src: "uploads/2502196_69dde479f1e3a0e1.jpg",
+        name: "자산 전체 사진",
+        primary: false
+      }
+    ];
+
+    let nextId = 10;
+    let ocrComplete = true;
+    let toastTimer;
+
+    const photoGrid = document.getElementById("photoGrid");
+    const additionalInput = document.getElementById("additionalInput");
+    const ocrInput = document.getElementById("ocrInput");
+    const ocrPreview = document.getElementById("ocrPreview");
+    const ocrImageElement = document.getElementById("ocrImage");
+    const ocrBadges = document.getElementById("ocrBadges");
+    const ocrStatus = document.getElementById("ocrStatus");
+    const toast = document.getElementById("toast");
+
+    function render() {
+      const totalImages = (ocrImage ? 1 : 0) + additionalImages.length;
+      document.getElementById("imageTotal").textContent = `${totalImages} / 5장`;
+      document.getElementById("additionalCount").textContent = `${additionalImages.length} / 4장 · 선택`;
+      document.getElementById("summaryImages").textContent = `${totalImages}장`;
+      document.getElementById("summaryAdditional").textContent = `${additionalImages.length}장`;
+      document.getElementById("summaryOcr").textContent = ocrComplete ? "추출 완료" : "추출 전";
+      document.getElementById("summaryOcr").classList.toggle("good", ocrComplete);
+
+      const primaryAdditional = additionalImages.find((image) => image.primary);
+      document.getElementById("summaryPrimary").textContent = primaryAdditional
+        ? primaryAdditional.name
+        : ocrImage?.primary
+          ? "OCR 대상"
+          : "미지정";
+
+      if (ocrImage) {
+        ocrImageElement.hidden = false;
+        ocrImageElement.src = ocrImage.src;
+        ocrPreview.querySelector(".ocr-empty")?.remove();
+        ocrBadges.innerHTML = `
+          <span class="badge">OCR 대상</span>
+          ${ocrImage.primary ? '<span class="badge primary-badge">대표</span>' : ""}
+        `;
+      } else {
+        ocrImageElement.hidden = true;
+        ocrBadges.innerHTML = "";
+        if (!ocrPreview.querySelector(".ocr-empty")) {
+          const empty = document.createElement("div");
+          empty.className = "ocr-empty";
+          empty.innerHTML = "OCR 대상 이미지가 없습니다.<br />이미지 교체 버튼으로 등록해 주세요.";
+          ocrPreview.appendChild(empty);
+        }
+      }
+
+      ocrStatus.textContent = ocrComplete ? "5개 항목 추출 완료" : "OCR 추출 전";
+      ocrStatus.classList.toggle("pending", !ocrComplete);
+      document.getElementById("ocrSetPrimary").hidden = !ocrImage || ocrImage.primary;
+      document.getElementById("ocrRun").textContent = ocrComplete ? "다시 추출" : "AI 자동 추출";
+
+      photoGrid.innerHTML = "";
+      additionalImages.forEach((image, index) => {
+        const item = document.createElement("article");
+        item.className = `photo-item${image.primary ? " primary-image" : ""}`;
+        item.innerHTML = `
+          <img src="${image.src}" alt="${image.name}" />
+          <button class="photo-delete" type="button" aria-label="${image.name} 삭제">×</button>
+          ${image.primary ? '<div class="image-badges"><span class="badge primary-badge">대표</span></div>' : ""}
+          <div class="photo-footer">
+            <span>${image.name}</span>
+            ${image.primary ? "" : '<button class="set-primary" type="button">대표로 지정</button>'}
+          </div>
+        `;
+        item.querySelector(".photo-delete").addEventListener("click", () => removeAdditional(index));
+        item.querySelector(".set-primary")?.addEventListener("click", () => setPrimary(index));
+        photoGrid.appendChild(item);
+      });
+
+      if (additionalImages.length < 4) {
+        const addButton = document.createElement("button");
+        addButton.className = "photo-add";
+        addButton.type = "button";
+        addButton.innerHTML = '<span><b>＋</b>사진 추가</span>';
+        addButton.addEventListener("click", () => additionalInput.click());
+        photoGrid.appendChild(addButton);
+      }
+    }
+
+    function setPrimary(index) {
+      if (ocrImage) ocrImage.primary = false;
+      additionalImages.forEach((image, imageIndex) => {
+        image.primary = imageIndex === index;
+      });
+      render();
+      showToast("선택한 추가 사진을 대표 이미지로 지정했습니다.");
+    }
+
+    function removeAdditional(index) {
+      const removed = additionalImages[index];
+      additionalImages.splice(index, 1);
+      if (removed.primary) {
+        if (ocrImage) {
+          ocrImage.primary = true;
+        } else if (additionalImages.length) {
+          additionalImages[0].primary = true;
+        }
+      }
+      render();
+      showToast("추가 사진을 삭제했습니다.");
+    }
+
+    function showToast(message) {
+      window.clearTimeout(toastTimer);
+      toast.textContent = message;
+      toast.classList.add("show");
+      toastTimer = window.setTimeout(() => toast.classList.remove("show"), 2400);
+    }
+
+    document.getElementById("ocrReplace").addEventListener("click", () => ocrInput.click());
+
+    document.getElementById("ocrSetPrimary").addEventListener("click", () => {
+      if (!ocrImage) return;
+      ocrImage.primary = true;
+      additionalImages.forEach((image) => { image.primary = false; });
+      render();
+      showToast("OCR 대상 이미지를 대표 이미지로 다시 지정했습니다.");
+    });
+
+    ocrInput.addEventListener("change", (event) => {
+      const file = event.target.files[0];
+      if (!file) return;
+      const hadPrimary = ocrImage?.primary || !additionalImages.some((image) => image.primary);
+      ocrImage = {
+        src: URL.createObjectURL(file),
+        name: file.name,
+        primary: hadPrimary
+      };
+      ocrComplete = false;
+      ocrInput.value = "";
+      render();
+      showToast("OCR 대상 이미지를 교체했습니다. 자동 추출을 실행해 주세요.");
+    });
+
+    document.getElementById("ocrRun").addEventListener("click", () => {
+      if (!ocrImage) {
+        showToast("먼저 OCR 대상 이미지를 등록해 주세요.");
+        return;
+      }
+      ocrComplete = true;
+      document.getElementById("assetNo").value = "2502196";
+      document.getElementById("assetName").value = "데스크톱컴퓨터";
+      document.getElementById("assetSpec").value = "230×475×465(mm)";
+      document.getElementById("purchaseDate").value = "2025-12-22";
+      document.getElementById("managingDept").value = "경남지능화혁신사업단";
+      render();
+      showToast("OCR 추출을 완료하고 5개 항목을 자동 입력했습니다.");
+    });
+
+    additionalInput.addEventListener("change", (event) => {
+      const availableSlots = 4 - additionalImages.length;
+      const files = Array.from(event.target.files).slice(0, availableSlots);
+      files.forEach((file) => {
+        additionalImages.push({
+          id: nextId++,
+          src: URL.createObjectURL(file),
+          name: file.name,
+          primary: !ocrImage && additionalImages.length === 0
+        });
+      });
+      additionalInput.value = "";
+      render();
+      showToast(files.length ? `${files.length}장의 추가 사진을 등록했습니다.` : "추가할 수 있는 사진 수를 확인해 주세요.");
+    });
+
+    function mockSubmit() {
+      const totalImages = (ocrImage ? 1 : 0) + additionalImages.length;
+      showToast(`목업 등록 확인: 이미지 ${totalImages}장과 자산 정보를 저장합니다.`);
+    }
+
+    document.getElementById("topSubmit").addEventListener("click", mockSubmit);
+    document.getElementById("bottomSubmit").addEventListener("click", mockSubmit);
+
+    render();
+  </script>
+</body>
+</html>

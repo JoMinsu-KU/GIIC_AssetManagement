@@ -1,0 +1,1121 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GIIC 자산 이미지 갤러리 목업</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --panel-soft: #f8faff;
+      --line: #e4eaf3;
+      --line-strong: #d6dfec;
+      --text: #18243a;
+      --muted: #6f7f98;
+      --blue: #3978f6;
+      --violet: #7658f5;
+      --blue-soft: #edf4ff;
+      --green: #16885a;
+      --green-soft: #e5f8ee;
+      --red: #d94747;
+      --red-soft: #fff0f0;
+      --shadow: 0 10px 28px rgba(28, 43, 70, 0.07);
+      --radius-lg: 20px;
+      --radius-md: 15px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html { color-scheme: light; }
+
+    body {
+      margin: 0;
+      min-width: 320px;
+      font-family: "Pretendard", "Noto Sans KR", "Apple SD Gothic Neo", sans-serif;
+      color: var(--text);
+      background: var(--bg);
+    }
+
+    button,
+    input { font: inherit; }
+
+    button { cursor: pointer; }
+
+    .topbar {
+      height: 76px;
+      padding: 0 34px;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      align-items: center;
+      gap: 24px;
+      background: rgba(255, 255, 255, 0.96);
+      border-bottom: 1px solid var(--line);
+      box-shadow: 0 3px 12px rgba(31, 45, 70, 0.04);
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      min-width: 0;
+    }
+
+    .brand-mark {
+      width: 38px;
+      height: 38px;
+      display: grid;
+      place-items: center;
+      flex: 0 0 auto;
+      color: #fff;
+      font-weight: 900;
+      font-size: 13px;
+      letter-spacing: -0.05em;
+      border-radius: 11px;
+      background: linear-gradient(135deg, var(--blue), var(--violet));
+    }
+
+    .brand-copy strong {
+      display: block;
+      font-size: 17px;
+      letter-spacing: -0.025em;
+      white-space: nowrap;
+    }
+
+    .brand-copy span {
+      display: block;
+      margin-top: 3px;
+      color: var(--muted);
+      font-size: 11px;
+      white-space: nowrap;
+    }
+
+    .nav {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .nav a {
+      padding: 11px 14px;
+      border-radius: 11px;
+      color: #42516a;
+      font-size: 14px;
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .nav a.active {
+      color: #255bd3;
+      background: var(--blue-soft);
+    }
+
+    .user-area {
+      justify-self: end;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      color: #34425a;
+      font-size: 13px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .role {
+      padding: 5px 9px;
+      color: #69778d;
+      font-size: 11px;
+      border-radius: 999px;
+      background: #f0f2f6;
+    }
+
+    .page {
+      width: min(1520px, calc(100% - 52px));
+      margin: 0 auto;
+      padding: 34px 0 58px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 24px;
+      margin-bottom: 22px;
+    }
+
+    .breadcrumb {
+      margin: 0 0 9px;
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 32px;
+      line-height: 1.2;
+      letter-spacing: -0.04em;
+    }
+
+    .subtitle {
+      margin: 9px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      flex-wrap: wrap;
+      gap: 9px;
+    }
+
+    .btn {
+      min-height: 43px;
+      padding: 0 16px;
+      border: 1px solid var(--line-strong);
+      border-radius: 12px;
+      color: #506078;
+      background: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      transition: transform 150ms ease, border-color 150ms ease, box-shadow 150ms ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-1px);
+      border-color: #bfcbe0;
+      box-shadow: 0 5px 12px rgba(35, 52, 82, 0.07);
+    }
+
+    .btn.primary {
+      color: #fff;
+      border-color: transparent;
+      background: linear-gradient(100deg, var(--blue), var(--violet));
+      box-shadow: 0 8px 17px rgba(72, 103, 239, 0.2);
+    }
+
+    .btn.danger {
+      color: var(--red);
+      border-color: #ffd0d0;
+      background: var(--red-soft);
+    }
+
+    .btn.small {
+      min-height: 36px;
+      padding: 0 12px;
+      font-size: 12px;
+      border-radius: 10px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid rgba(225, 232, 242, 0.95);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .hero {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(560px, 0.95fr);
+      align-items: stretch;
+      gap: 18px;
+      margin-bottom: 18px;
+    }
+
+    .summary-card {
+      position: relative;
+      overflow: hidden;
+      padding: 28px;
+    }
+
+    .summary-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto;
+      height: 4px;
+      background: linear-gradient(90deg, var(--blue), var(--violet));
+    }
+
+    .overline {
+      margin: 0 0 13px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+    }
+
+    .asset-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 18px;
+    }
+
+    .asset-heading h2 {
+      margin: 0;
+      font-size: 31px;
+      letter-spacing: -0.04em;
+    }
+
+    .asset-heading p {
+      margin: 8px 0 0;
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      flex: 0 0 auto;
+      padding: 7px 11px;
+      color: var(--green);
+      background: var(--green-soft);
+      border-radius: 9px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 25px;
+    }
+
+    .summary-item {
+      min-height: 92px;
+      padding: 16px 17px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      gap: 8px;
+      border: 1px solid #e7edf6;
+      border-radius: var(--radius-md);
+      background: var(--panel-soft);
+    }
+
+    .summary-item span {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .summary-item strong {
+      font-size: 16px;
+      line-height: 1.45;
+      letter-spacing: -0.02em;
+      word-break: keep-all;
+    }
+
+    .summary-item.department strong { white-space: nowrap; }
+
+    .summary-note {
+      margin: 21px 0 0;
+      padding-top: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.65;
+      border-top: 1px solid #edf1f6;
+    }
+
+    .gallery-card {
+      min-width: 0;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .gallery-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 14px;
+      margin-bottom: 16px;
+    }
+
+    .gallery-head h3 {
+      margin: 0;
+      font-size: 19px;
+      letter-spacing: -0.025em;
+    }
+
+    .gallery-head p {
+      margin: 5px 0 0;
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.5;
+    }
+
+    .gallery-state {
+      flex: 0 0 auto;
+      padding: 6px 9px;
+      color: #53637b;
+      background: #f3f6fa;
+      border-radius: 8px;
+      font-size: 11px;
+      font-weight: 800;
+    }
+
+    .gallery-state.editing {
+      color: #2b61da;
+      background: var(--blue-soft);
+    }
+
+    .gallery-layout {
+      min-height: 390px;
+      display: grid;
+      grid-template-columns: 82px minmax(0, 1fr);
+      gap: 13px;
+    }
+
+    .thumb-list {
+      max-height: 390px;
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      scrollbar-width: thin;
+      scrollbar-color: #c9d2df transparent;
+    }
+
+    .thumb,
+    .add-thumb {
+      position: relative;
+      width: 100%;
+      height: 76px;
+      flex: 0 0 76px;
+      padding: 0;
+      overflow: hidden;
+      border: 2px solid transparent;
+      border-radius: 11px;
+      background: #f4f7fa;
+    }
+
+    .thumb img {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: cover;
+    }
+
+    .thumb.active {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 2px rgba(57, 120, 246, 0.12);
+    }
+
+    .primary-mark {
+      position: absolute;
+      left: 5px;
+      bottom: 5px;
+      padding: 3px 6px;
+      color: #fff;
+      border-radius: 6px;
+      background: rgba(30, 49, 83, 0.84);
+      font-size: 9px;
+      font-weight: 800;
+      pointer-events: none;
+    }
+
+    .remove-image {
+      position: absolute;
+      top: 4px;
+      right: 4px;
+      width: 25px;
+      height: 25px;
+      padding: 0;
+      display: none;
+      place-items: center;
+      color: #fff;
+      border: 2px solid #fff;
+      border-radius: 50%;
+      background: rgba(190, 48, 48, 0.94);
+      font-size: 16px;
+      font-weight: 500;
+      line-height: 1;
+      box-shadow: 0 3px 8px rgba(94, 26, 26, 0.2);
+    }
+
+    .edit-mode .remove-image { display: grid; }
+
+    .add-thumb {
+      display: none;
+      place-items: center;
+      color: #54719e;
+      border: 1px dashed #aebdd3;
+      background: #f8fbff;
+    }
+
+    .edit-mode .add-thumb { display: grid; }
+
+    .add-thumb span {
+      display: grid;
+      gap: 2px;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 800;
+    }
+
+    .add-thumb b {
+      font-size: 23px;
+      font-weight: 400;
+      line-height: 1;
+    }
+
+    .main-image-wrap {
+      position: relative;
+      min-width: 0;
+      height: 390px;
+      display: grid;
+      place-items: center;
+      overflow: hidden;
+      border: 1px solid #e1e8f1;
+      border-radius: 15px;
+      background: #f6f8fb;
+    }
+
+    .main-image {
+      width: 100%;
+      height: 100%;
+      display: block;
+      object-fit: contain;
+      background: #f6f8fb;
+    }
+
+    .gallery-nav {
+      position: absolute;
+      top: 50%;
+      width: 40px;
+      height: 40px;
+      display: grid;
+      place-items: center;
+      padding: 0;
+      color: #263650;
+      border: 1px solid rgba(207, 216, 229, 0.9);
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.92);
+      box-shadow: 0 5px 14px rgba(25, 39, 61, 0.12);
+      transform: translateY(-50%);
+    }
+
+    .gallery-nav:hover { background: #fff; }
+    .gallery-nav.prev { left: 13px; }
+    .gallery-nav.next { right: 13px; }
+
+    .gallery-nav svg,
+    .expand svg { width: 19px; height: 19px; }
+
+    .image-count {
+      position: absolute;
+      right: 13px;
+      bottom: 13px;
+      padding: 6px 9px;
+      color: #fff;
+      border-radius: 8px;
+      background: rgba(25, 37, 57, 0.72);
+      font-size: 11px;
+      font-weight: 800;
+      backdrop-filter: blur(5px);
+    }
+
+    .expand {
+      position: absolute;
+      right: 63px;
+      bottom: 13px;
+      width: 30px;
+      height: 30px;
+      padding: 0;
+      display: grid;
+      place-items: center;
+      color: #fff;
+      border: 0;
+      border-radius: 8px;
+      background: rgba(25, 37, 57, 0.72);
+      backdrop-filter: blur(5px);
+    }
+
+    .empty-gallery {
+      display: grid;
+      place-items: center;
+      width: 100%;
+      height: 100%;
+      color: var(--muted);
+      text-align: center;
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .gallery-footer {
+      min-height: 44px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 14px;
+      padding-top: 14px;
+    }
+
+    .image-caption {
+      min-width: 0;
+      color: var(--muted);
+      font-size: 12px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .image-caption strong {
+      margin-right: 7px;
+      color: #31425e;
+    }
+
+    .edit-tools {
+      display: none;
+      flex: 0 0 auto;
+      gap: 8px;
+    }
+
+    .edit-mode .edit-tools { display: flex; }
+
+    .details {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 18px;
+    }
+
+    .detail-card { padding: 24px 26px; }
+
+    .detail-card h3 {
+      margin: 0 0 17px;
+      font-size: 19px;
+      letter-spacing: -0.025em;
+    }
+
+    .detail-row {
+      display: grid;
+      grid-template-columns: 135px minmax(0, 1fr);
+      gap: 16px;
+      padding: 14px 0;
+      border-top: 1px solid #edf1f6;
+      font-size: 14px;
+      line-height: 1.55;
+    }
+
+    .detail-row:first-of-type { border-top: 0; }
+
+    .detail-label {
+      color: var(--muted);
+      font-weight: 800;
+    }
+
+    .detail-value { word-break: keep-all; }
+    .detail-value.strong { font-weight: 800; }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      z-index: 50;
+      display: none;
+      place-items: center;
+      padding: 28px;
+      background: rgba(13, 21, 34, 0.78);
+      backdrop-filter: blur(5px);
+    }
+
+    .modal.open { display: grid; }
+
+    .modal-dialog {
+      position: relative;
+      width: min(1180px, 100%);
+      height: min(820px, calc(100vh - 56px));
+      display: grid;
+      place-items: center;
+      border-radius: 18px;
+      background: #101722;
+      overflow: hidden;
+    }
+
+    .modal-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      z-index: 2;
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      color: #fff;
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      border-radius: 50%;
+      background: rgba(0, 0, 0, 0.46);
+      font-size: 24px;
+    }
+
+    .toast {
+      position: fixed;
+      left: 50%;
+      bottom: 28px;
+      z-index: 80;
+      max-width: calc(100% - 32px);
+      padding: 12px 17px;
+      color: #fff;
+      border-radius: 11px;
+      background: rgba(28, 40, 61, 0.94);
+      box-shadow: 0 8px 24px rgba(16, 26, 42, 0.2);
+      font-size: 13px;
+      font-weight: 700;
+      opacity: 0;
+      pointer-events: none;
+      transform: translate(-50%, 12px);
+      transition: 180ms ease;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+
+    @media (max-width: 1180px) {
+      .topbar { grid-template-columns: 1fr auto; }
+      .nav { display: none; }
+      .hero { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+      .summary-item.department strong { white-space: normal; }
+    }
+
+    @media (max-width: 780px) {
+      .topbar {
+        height: 66px;
+        padding: 0 18px;
+      }
+
+      .brand-copy span,
+      .role { display: none; }
+
+      .page {
+        width: min(100% - 28px, 1520px);
+        padding-top: 24px;
+      }
+
+      .page-header { flex-direction: column; }
+      .actions { justify-content: flex-start; }
+      h1 { font-size: 28px; }
+      .summary-card,
+      .gallery-card,
+      .detail-card { padding: 20px; }
+      .summary-grid { grid-template-columns: 1fr 1fr; }
+      .summary-item.department { grid-column: 1 / -1; }
+      .gallery-layout {
+        min-height: 0;
+        display: flex;
+        flex-direction: column-reverse;
+      }
+      .main-image-wrap { height: 330px; }
+      .thumb-list {
+        max-width: 100%;
+        max-height: none;
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+      }
+      .thumb,
+      .add-thumb {
+        width: 74px;
+        flex-basis: 74px;
+      }
+      .details { grid-template-columns: 1fr; }
+      .detail-row { grid-template-columns: 110px minmax(0, 1fr); }
+    }
+
+    @media (max-width: 500px) {
+      .user-area { display: none; }
+      .topbar { grid-template-columns: 1fr; }
+      .summary-grid { grid-template-columns: 1fr; }
+      .summary-item.department { grid-column: auto; }
+      .main-image-wrap { height: 280px; }
+      .gallery-footer { align-items: flex-start; flex-direction: column; }
+      .detail-row { grid-template-columns: 1fr; gap: 5px; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark">GIIC</div>
+      <div class="brand-copy">
+        <strong>경남지능화혁신사업단</strong>
+        <span>Gyeongnam Intelligence Innovation Center</span>
+      </div>
+    </div>
+    <nav class="nav" aria-label="주 메뉴">
+      <a href="#">대시보드</a>
+      <a class="active" href="#">자산 관리</a>
+      <a href="#">유지보수</a>
+      <a href="#">사용자 관리</a>
+      <a href="#">시스템 설정</a>
+    </nav>
+    <div class="user-area">
+      <span>조민수</span>
+      <span class="role">슈퍼관리자</span>
+    </div>
+  </header>
+
+  <main class="page">
+    <header class="page-header">
+      <div>
+        <p class="breadcrumb">자산관리 / 상세정보</p>
+        <h1>자산 상세</h1>
+        <p class="subtitle">대표 이미지와 추가 사진을 한 곳에서 확인하고 관리합니다.</p>
+      </div>
+      <div class="actions" id="viewActions">
+        <button class="btn">목록</button>
+        <button class="btn">이관 신청</button>
+        <button class="btn">유지보수 신청</button>
+        <button class="btn">폐기 신청</button>
+        <button class="btn primary" id="editButton">수정</button>
+        <button class="btn danger">삭제</button>
+      </div>
+      <div class="actions" id="editActions" hidden>
+        <button class="btn" id="cancelButton">취소</button>
+        <button class="btn primary" id="saveButton">수정 완료</button>
+      </div>
+    </header>
+
+    <section class="hero">
+      <article class="card summary-card">
+        <p class="overline">핵심 요약</p>
+        <div class="asset-heading">
+          <div>
+            <h2>작업용의자</h2>
+            <p>자산번호 2502289 · 규격 595×925×1015(mm)</p>
+          </div>
+          <span class="status">정상</span>
+        </div>
+        <div class="summary-grid">
+          <div class="summary-item department">
+            <span>관리부서</span>
+            <strong>경남지능화혁신사업단</strong>
+          </div>
+          <div class="summary-item">
+            <span>취득금액</span>
+            <strong>285,000원</strong>
+          </div>
+          <div class="summary-item">
+            <span>취득일자</span>
+            <strong>2025. 12. 26.</strong>
+          </div>
+          <div class="summary-item">
+            <span>등록자</span>
+            <strong>조민수</strong>
+          </div>
+        </div>
+        <p class="summary-note">
+          조회 시에는 대표 사진이 먼저 표시됩니다. 수정 모드에서도 정보 배치는 유지하고 이미지 관리 기능만 노출합니다.
+        </p>
+      </article>
+
+      <article class="card gallery-card" id="galleryCard">
+        <div class="gallery-head">
+          <div>
+            <h3>자산 이미지</h3>
+            <p id="galleryDescription">썸네일을 선택하면 큰 이미지로 확인할 수 있습니다.</p>
+          </div>
+          <span class="gallery-state" id="galleryState">조회 모드</span>
+        </div>
+
+        <div class="gallery-layout">
+          <div class="thumb-list" id="thumbnailList" aria-label="자산 이미지 목록"></div>
+          <div class="main-image-wrap" id="mainImageWrap">
+            <img class="main-image" id="mainImage" alt="선택된 자산 이미지" />
+            <button class="gallery-nav prev" id="previousImage" aria-label="이전 이미지">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <button class="gallery-nav next" id="nextImage" aria-label="다음 이미지">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
+            <button class="expand" id="expandImage" aria-label="이미지 확대">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 3H3v5M16 3h5v5M8 21H3v-5M16 21h5v-5"/></svg>
+            </button>
+            <span class="image-count" id="imageCount"></span>
+          </div>
+        </div>
+
+        <div class="gallery-footer">
+          <div class="image-caption" id="imageCaption"></div>
+          <div class="edit-tools">
+            <button class="btn small" id="setPrimaryButton">대표 이미지로 지정</button>
+          </div>
+        </div>
+
+        <input id="imageInput" type="file" accept="image/*" multiple hidden />
+      </article>
+    </section>
+
+    <section class="details">
+      <article class="card detail-card">
+        <h3>기본 정보</h3>
+        <div class="detail-row"><span class="detail-label">자산번호</span><span class="detail-value strong">2502289</span></div>
+        <div class="detail-row"><span class="detail-label">물품명</span><span class="detail-value">작업용의자</span></div>
+        <div class="detail-row"><span class="detail-label">모델명</span><span class="detail-value">-</span></div>
+        <div class="detail-row"><span class="detail-label">규격</span><span class="detail-value">595×925×1015(mm)</span></div>
+        <div class="detail-row"><span class="detail-label">등록일</span><span class="detail-value">2026. 3. 10.</span></div>
+      </article>
+      <article class="card detail-card">
+        <h3>재무 · 관리 정보</h3>
+        <div class="detail-row"><span class="detail-label">취득금액</span><span class="detail-value">285,000원</span></div>
+        <div class="detail-row"><span class="detail-label">취득일자</span><span class="detail-value">2025. 12. 26.</span></div>
+        <div class="detail-row"><span class="detail-label">관리부서</span><span class="detail-value">경남지능화혁신사업단</span></div>
+        <div class="detail-row"><span class="detail-label">비치장소</span><span class="detail-value">제조DX혁신연구실(한마관 지상3층)</span></div>
+        <div class="detail-row"><span class="detail-label">상태</span><span class="detail-value"><span class="status">정상</span></span></div>
+      </article>
+    </section>
+  </main>
+
+  <div class="modal" id="imageModal" role="dialog" aria-modal="true" aria-label="이미지 확대 보기">
+    <div class="modal-dialog">
+      <button class="modal-close" id="modalClose" aria-label="닫기">×</button>
+      <img class="modal-image" id="modalImage" alt="확대된 자산 이미지" />
+    </div>
+  </div>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script>
+    const initialImages = [
+      {
+        id: 1,
+        src: "uploads/2502289_d7c96165eb4181ae.jpg",
+        name: "자산 전체 사진",
+        primary: true
+      },
+      {
+        id: 2,
+        src: "uploads/2502289_ccca9ed29a3acb7c.jpg",
+        name: "자산 라벨 사진",
+        primary: false
+      },
+      {
+        id: 3,
+        src: "uploads/2502289_3c5340371308acfd.png",
+        name: "OCR 대상 원본",
+        primary: false
+      }
+    ];
+
+    let committedImages = cloneImages(initialImages);
+    let images = cloneImages(initialImages);
+    let selectedIndex = images.findIndex((image) => image.primary);
+    let editMode = false;
+    let nextImageId = 10;
+    let toastTimer;
+
+    const galleryCard = document.getElementById("galleryCard");
+    const galleryState = document.getElementById("galleryState");
+    const galleryDescription = document.getElementById("galleryDescription");
+    const thumbnailList = document.getElementById("thumbnailList");
+    const mainImageWrap = document.getElementById("mainImageWrap");
+    const mainImage = document.getElementById("mainImage");
+    const imageCount = document.getElementById("imageCount");
+    const imageCaption = document.getElementById("imageCaption");
+    const previousImage = document.getElementById("previousImage");
+    const nextImage = document.getElementById("nextImage");
+    const expandImage = document.getElementById("expandImage");
+    const setPrimaryButton = document.getElementById("setPrimaryButton");
+    const imageInput = document.getElementById("imageInput");
+    const viewActions = document.getElementById("viewActions");
+    const editActions = document.getElementById("editActions");
+    const imageModal = document.getElementById("imageModal");
+    const modalImage = document.getElementById("modalImage");
+    const toast = document.getElementById("toast");
+
+    function cloneImages(source) {
+      return source.map((image) => ({ ...image }));
+    }
+
+    function render() {
+      galleryCard.classList.toggle("edit-mode", editMode);
+      galleryState.classList.toggle("editing", editMode);
+      galleryState.textContent = editMode ? "수정 모드" : "조회 모드";
+      galleryDescription.textContent = editMode
+        ? "사진을 추가·삭제하거나 대표 이미지를 변경할 수 있습니다."
+        : "썸네일을 선택하면 큰 이미지로 확인할 수 있습니다.";
+      viewActions.hidden = editMode;
+      editActions.hidden = !editMode;
+
+      if (selectedIndex >= images.length) selectedIndex = Math.max(0, images.length - 1);
+      thumbnailList.innerHTML = "";
+
+      images.forEach((image, index) => {
+        const thumbnail = document.createElement("button");
+        thumbnail.className = `thumb${index === selectedIndex ? " active" : ""}`;
+        thumbnail.type = "button";
+        thumbnail.setAttribute("aria-label", `${image.name}${image.primary ? ", 대표 이미지" : ""}`);
+        thumbnail.innerHTML = `
+          <img src="${image.src}" alt="${image.name}" />
+          ${image.primary ? '<span class="primary-mark">대표</span>' : ""}
+          <span class="remove-image" role="button" aria-label="${image.name} 삭제">×</span>
+        `;
+        thumbnail.addEventListener("click", () => {
+          selectedIndex = index;
+          render();
+        });
+        thumbnail.querySelector(".remove-image").addEventListener("click", (event) => {
+          event.stopPropagation();
+          removeImage(index);
+        });
+        thumbnailList.appendChild(thumbnail);
+      });
+
+      if (editMode && images.length < 5) {
+        const addButton = document.createElement("button");
+        addButton.className = "add-thumb";
+        addButton.type = "button";
+        addButton.innerHTML = '<span><b>＋</b>사진 추가</span>';
+        addButton.addEventListener("click", () => imageInput.click());
+        thumbnailList.appendChild(addButton);
+      }
+
+      if (!images.length) {
+        mainImage.hidden = true;
+        previousImage.hidden = true;
+        nextImage.hidden = true;
+        expandImage.hidden = true;
+        imageCount.hidden = true;
+        mainImageWrap.querySelector(".empty-gallery")?.remove();
+        const empty = document.createElement("div");
+        empty.className = "empty-gallery";
+        empty.innerHTML = editMode
+          ? "등록된 이미지가 없습니다.<br />왼쪽의 사진 추가 버튼을 선택해 주세요."
+          : "등록된 이미지가 없습니다.";
+        mainImageWrap.appendChild(empty);
+        imageCaption.textContent = "이미지 미등록";
+        setPrimaryButton.hidden = true;
+        return;
+      }
+
+      mainImageWrap.querySelector(".empty-gallery")?.remove();
+      const selectedImage = images[selectedIndex];
+      mainImage.hidden = false;
+      mainImage.src = selectedImage.src;
+      mainImage.alt = selectedImage.name;
+      previousImage.hidden = images.length < 2;
+      nextImage.hidden = images.length < 2;
+      expandImage.hidden = false;
+      imageCount.hidden = false;
+      imageCount.textContent = `${selectedIndex + 1} / ${images.length}`;
+      imageCaption.innerHTML = `<strong>${selectedImage.primary ? "대표 이미지" : "추가 이미지"}</strong>${selectedImage.name}`;
+      setPrimaryButton.hidden = !editMode || selectedImage.primary;
+    }
+
+    function removeImage(index) {
+      const removed = images[index];
+      images.splice(index, 1);
+      if (removed.primary && images.length) {
+        images[0].primary = true;
+        showToast("대표 이미지가 삭제되어 첫 번째 사진을 대표로 지정했습니다.");
+      } else {
+        showToast("사진을 삭제 대기 상태로 변경했습니다. 수정 완료 시 반영됩니다.");
+      }
+      selectedIndex = Math.min(index, images.length - 1);
+      render();
+    }
+
+    function moveSelection(direction) {
+      if (images.length < 2) return;
+      selectedIndex = (selectedIndex + direction + images.length) % images.length;
+      render();
+    }
+
+    function showToast(message) {
+      window.clearTimeout(toastTimer);
+      toast.textContent = message;
+      toast.classList.add("show");
+      toastTimer = window.setTimeout(() => toast.classList.remove("show"), 2500);
+    }
+
+    document.getElementById("editButton").addEventListener("click", () => {
+      editMode = true;
+      render();
+    });
+
+    document.getElementById("cancelButton").addEventListener("click", () => {
+      images = cloneImages(committedImages);
+      selectedIndex = Math.max(0, images.findIndex((image) => image.primary));
+      editMode = false;
+      render();
+      showToast("이미지 변경을 취소했습니다.");
+    });
+
+    document.getElementById("saveButton").addEventListener("click", () => {
+      committedImages = cloneImages(images);
+      editMode = false;
+      render();
+      showToast("목업에서 이미지 변경 내용을 저장했습니다.");
+    });
+
+    setPrimaryButton.addEventListener("click", () => {
+      images.forEach((image, index) => { image.primary = index === selectedIndex; });
+      render();
+      showToast("선택한 사진을 대표 이미지로 지정했습니다.");
+    });
+
+    imageInput.addEventListener("change", (event) => {
+      const availableSlots = 5 - images.length;
+      const selectedFiles = Array.from(event.target.files).slice(0, availableSlots);
+      selectedFiles.forEach((file) => {
+        images.push({
+          id: nextImageId++,
+          src: URL.createObjectURL(file),
+          name: file.name,
+          primary: images.length === 0
+        });
+      });
+      if (selectedFiles.length) {
+        selectedIndex = images.length - selectedFiles.length;
+        showToast(`${selectedFiles.length}장의 사진을 추가했습니다. 수정 완료 시 반영됩니다.`);
+      }
+      if (event.target.files.length > availableSlots) {
+        showToast("사진은 최대 5장까지 등록할 수 있습니다.");
+      }
+      imageInput.value = "";
+      render();
+    });
+
+    previousImage.addEventListener("click", () => moveSelection(-1));
+    nextImage.addEventListener("click", () => moveSelection(1));
+
+    expandImage.addEventListener("click", () => {
+      if (!images.length) return;
+      modalImage.src = images[selectedIndex].src;
+      modalImage.alt = images[selectedIndex].name;
+      imageModal.classList.add("open");
+      document.body.style.overflow = "hidden";
+    });
+
+    function closeModal() {
+      imageModal.classList.remove("open");
+      document.body.style.overflow = "";
+    }
+
+    document.getElementById("modalClose").addEventListener("click", closeModal);
+    imageModal.addEventListener("click", (event) => {
+      if (event.target === imageModal) closeModal();
+    });
+
+    document.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && imageModal.classList.contains("open")) closeModal();
+      if (event.key === "ArrowLeft" && !imageModal.classList.contains("open")) moveSelection(-1);
+      if (event.key === "ArrowRight" && !imageModal.classList.contains("open")) moveSelection(1);
+    });
+
+    render();
+  </script>
+</body>
+</html>

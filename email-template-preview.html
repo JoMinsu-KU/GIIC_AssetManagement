@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GIIC 회원 이메일 템플릿 시안</title>
+    <style>
+        :root {
+            --ink: #17233b;
+            --muted: #6c7890;
+            --line: #e1e7f0;
+            --canvas: #eef2f7;
+            --brand: #496fe8;
+            --brand-deep: #2f55c8;
+            --brand-soft: #edf3ff;
+            --green: #24845a;
+            --green-soft: #eaf8f0;
+            --red: #b34d55;
+            --red-soft: #fff0f1;
+            --amber: #9a6b12;
+            --amber-soft: #fff7df;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at 10% 0%, rgba(73, 111, 232, 0.08), transparent 30%),
+                var(--canvas);
+            color: var(--ink);
+            font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+        }
+
+        button,
+        a {
+            font: inherit;
+        }
+
+        .preview-header {
+            padding: 34px 28px 24px;
+            border-bottom: 1px solid rgba(207, 216, 230, 0.86);
+            background: rgba(248, 250, 253, 0.88);
+        }
+
+        .preview-header-inner {
+            width: min(1080px, 100%);
+            margin: 0 auto;
+        }
+
+        .preview-kicker {
+            margin: 0 0 8px;
+            color: var(--brand-deep);
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.14em;
+        }
+
+        .preview-title {
+            margin: 0;
+            font-size: clamp(25px, 4vw, 34px);
+            letter-spacing: -0.035em;
+        }
+
+        .preview-description {
+            max-width: 690px;
+            margin: 12px 0 0;
+            color: var(--muted);
+            font-size: 15px;
+            line-height: 1.7;
+        }
+
+        .template-tabs {
+            display: flex;
+            gap: 8px;
+            width: min(1080px, calc(100% - 40px));
+            margin: 24px auto 0;
+            padding: 6px;
+            overflow-x: auto;
+            border: 1px solid #dce3ee;
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.82);
+            scrollbar-width: none;
+        }
+
+        .template-tabs::-webkit-scrollbar {
+            display: none;
+        }
+
+        .template-tab {
+            flex: 1 0 auto;
+            min-width: 150px;
+            padding: 11px 15px;
+            border: 0;
+            border-radius: 9px;
+            background: transparent;
+            color: #69768b;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 700;
+            transition: background 160ms ease, color 160ms ease, box-shadow 160ms ease;
+        }
+
+        .template-tab:hover {
+            color: var(--ink);
+            background: #f3f6fa;
+        }
+
+        .template-tab.active {
+            color: #2348b0;
+            background: #edf3ff;
+            box-shadow: inset 0 0 0 1px #d5e0ff;
+        }
+
+        .preview-canvas {
+            padding: 30px 18px 60px;
+        }
+
+        .email-stage {
+            display: none;
+            animation: reveal 220ms ease-out both;
+        }
+
+        .email-stage.active {
+            display: block;
+        }
+
+        .email-caption {
+            width: min(640px, 100%);
+            margin: 0 auto 12px;
+            color: #718096;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.04em;
+        }
+
+        .email-frame {
+            width: min(640px, 100%);
+            margin: 0 auto;
+            overflow: hidden;
+            border: 1px solid #dce3ec;
+            border-radius: 16px;
+            background: #ffffff;
+            box-shadow: 0 18px 50px rgba(31, 46, 76, 0.1);
+        }
+
+        .email-table {
+            width: 100%;
+            border: 0;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+
+        .brand-line {
+            height: 5px;
+            background: #486fe8;
+            background-image: linear-gradient(90deg, #3f7cff, #6d5df6);
+        }
+
+        .email-header-cell {
+            padding: 24px 38px 20px;
+            border-bottom: 1px solid #edf1f6;
+        }
+
+        .brand-lockup {
+            display: table;
+            width: 100%;
+        }
+
+        .brand-name {
+            display: table-cell;
+            color: #2249ac;
+            font-size: 18px;
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            vertical-align: middle;
+        }
+
+        .brand-system {
+            display: table-cell;
+            color: #8792a5;
+            font-size: 12px;
+            text-align: right;
+            vertical-align: middle;
+        }
+
+        .email-body-cell {
+            padding: 42px 38px 36px;
+        }
+
+        .status-mark {
+            display: inline-block;
+            margin-bottom: 18px;
+            padding: 7px 11px;
+            border-radius: 999px;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        .status-mark.blue {
+            color: #315bc5;
+            background: var(--brand-soft);
+        }
+
+        .status-mark.green {
+            color: var(--green);
+            background: var(--green-soft);
+        }
+
+        .status-mark.red {
+            color: var(--red);
+            background: var(--red-soft);
+        }
+
+        .status-mark.navy {
+            color: #223f87;
+            background: #eaf0fb;
+        }
+
+        .mail-title {
+            margin: 0;
+            color: #17233b;
+            font-size: 27px;
+            line-height: 1.35;
+            letter-spacing: -0.035em;
+        }
+
+        .mail-copy {
+            margin: 16px 0 0;
+            color: #647188;
+            font-size: 15px;
+            line-height: 1.75;
+        }
+
+        .name-strong {
+            color: #273958;
+            font-weight: 800;
+        }
+
+        .info-card {
+            width: 100%;
+            margin-top: 28px;
+            overflow: hidden;
+            border: 1px solid #e2e8f1;
+            border-radius: 10px;
+            border-collapse: separate;
+            border-spacing: 0;
+            background: #f9fbfd;
+        }
+
+        .info-label,
+        .info-value {
+            padding: 12px 16px;
+            border-bottom: 1px solid #e8edf4;
+            font-size: 13px;
+            line-height: 1.5;
+        }
+
+        .info-card tr:last-child .info-label,
+        .info-card tr:last-child .info-value {
+            border-bottom: 0;
+        }
+
+        .info-label {
+            width: 116px;
+            color: #7c899d;
+            font-weight: 700;
+        }
+
+        .info-value {
+            color: #263652;
+            font-weight: 700;
+        }
+
+        .progress-box {
+            margin-top: 20px;
+            padding: 16px;
+            border: 1px solid #e3e9f2;
+            border-radius: 10px;
+            background: #ffffff;
+        }
+
+        .progress-row {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .progress-step {
+            width: 33.33%;
+            color: #9aa5b5;
+            font-size: 11px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .progress-step.current {
+            color: #315bc5;
+        }
+
+        .progress-dot {
+            display: block;
+            width: 9px;
+            height: 9px;
+            margin: 0 auto 8px;
+            border: 2px solid #cbd5e3;
+            border-radius: 50%;
+            background: #ffffff;
+        }
+
+        .progress-step.current .progress-dot {
+            border-color: #4d73e8;
+            background: #4d73e8;
+            box-shadow: 0 0 0 4px #edf2ff;
+        }
+
+        .action-wrap {
+            margin-top: 28px;
+            text-align: left;
+        }
+
+        .action-button {
+            display: inline-block;
+            padding: 13px 22px;
+            border-radius: 9px;
+            background: #496fe8;
+            background-image: linear-gradient(135deg, #3f7cff, #6d5df6);
+            color: #ffffff !important;
+            font-size: 14px;
+            font-weight: 800;
+            text-decoration: none;
+        }
+
+        .notice-box {
+            margin-top: 22px;
+            padding: 14px 16px;
+            border-left: 3px solid #b8c7e8;
+            background: #f7f9fc;
+            color: #69768a;
+            font-size: 12px;
+            line-height: 1.65;
+        }
+
+        .notice-box.green {
+            border-left-color: #72bd98;
+            background: #f2faf5;
+        }
+
+        .notice-box.red {
+            border-left-color: #d7a0a5;
+            background: #fff7f7;
+        }
+
+        .email-footer-cell {
+            padding: 22px 38px 26px;
+            border-top: 1px solid #edf1f6;
+            background: #f8fafc;
+            color: #929daf;
+            font-size: 11px;
+            line-height: 1.7;
+        }
+
+        .footer-org {
+            margin-bottom: 4px;
+            color: #66738a;
+            font-size: 12px;
+            font-weight: 800;
+        }
+
+        @keyframes reveal {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 600px) {
+            .preview-header {
+                padding: 26px 20px 20px;
+            }
+
+            .template-tabs {
+                width: calc(100% - 24px);
+            }
+
+            .preview-canvas {
+                padding: 20px 10px 40px;
+            }
+
+            .email-frame {
+                border-radius: 10px;
+            }
+
+            .email-header-cell,
+            .email-body-cell,
+            .email-footer-cell {
+                padding-left: 22px;
+                padding-right: 22px;
+            }
+
+            .brand-system {
+                display: none;
+            }
+
+            .mail-title {
+                font-size: 23px;
+            }
+
+            .info-label {
+                width: 90px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="preview-header">
+        <div class="preview-header-inner">
+            <p class="preview-kicker">EMAIL SYSTEM / DRAFT 01</p>
+            <h1 class="preview-title">회원 알림 메일 디자인</h1>
+            <p class="preview-description">
+                GIIC 자산관리시스템의 화면 톤을 유지하면서도 메일함에서 빠르게 상태를 파악할 수 있도록 구성했습니다.
+                탭을 눌러 사용자·슈퍼관리자에게 발송될 네 가지 본문을 비교할 수 있습니다.
+            </p>
+        </div>
+    </header>
+
+    <nav class="template-tabs" aria-label="메일 템플릿 선택">
+        <button class="template-tab active" type="button" data-target="received">사용자 · 접수</button>
+        <button class="template-tab" type="button" data-target="approved">사용자 · 승인</button>
+        <button class="template-tab" type="button" data-target="rejected">사용자 · 반려</button>
+        <button class="template-tab" type="button" data-target="super-request">슈퍼관리자 · 승인 요청</button>
+    </nav>
+
+    <main class="preview-canvas">
+        <section class="email-stage active" data-template="received">
+            <p class="email-caption">USER_SIGNUP_RECEIVED · 회원가입 요청 접수</p>
+            <div class="email-frame">
+                <table class="email-table" role="presentation" cellpadding="0" cellspacing="0">
+                    <tr><td class="brand-line"></td></tr>
+                    <tr>
+                        <td class="email-header-cell">
+                            <div class="brand-lockup">
+                                <div class="brand-name">GIIC</div>
+                                <div class="brand-system">경남지능화혁신사업단 자산관리시스템</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="email-body-cell">
+                            <span class="status-mark blue">접수 완료</span>
+                            <h2 class="mail-title">회원가입 요청을<br>정상적으로 접수했습니다.</h2>
+                            <p class="mail-copy">
+                                <span class="name-strong">김지현님</span>, 회원가입을 신청해 주셔서 감사합니다.<br>
+                                슈퍼관리자가 신청 정보를 확인하고 있으며, 처리 결과는 이메일로 다시 안내해 드립니다.
+                            </p>
+
+                            <table class="info-card" role="presentation" cellpadding="0" cellspacing="0">
+                                <tr><td class="info-label">사번</td><td class="info-value">2018202</td></tr>
+                                <tr><td class="info-label">부서</td><td class="info-value">경남지능화혁신사업단</td></tr>
+                                <tr><td class="info-label">신청일시</td><td class="info-value">2026. 07. 14. 14:30</td></tr>
+                                <tr><td class="info-label">현재 상태</td><td class="info-value" style="color:#315bc5;">승인 대기</td></tr>
+                            </table>
+
+                            <div class="progress-box">
+                                <table class="progress-row" role="presentation">
+                                    <tr>
+                                        <td class="progress-step current"><span class="progress-dot"></span>요청 접수</td>
+                                        <td class="progress-step"><span class="progress-dot"></span>정보 검토</td>
+                                        <td class="progress-step"><span class="progress-dot"></span>결과 안내</td>
+                                    </tr>
+                                </table>
+                            </div>
+
+                            <div class="notice-box">
+                                본 메일은 가입 요청이 정상 접수되었음을 확인하는 안내입니다. 승인 전에는 시스템에 로그인할 수 없습니다.
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="email-footer-cell">
+                            <div class="footer-org">GIIC 경남지능화혁신사업단</div>
+                            본 메일은 발신 전용입니다. 문의가 필요한 경우 사업단 담당자에게 연락해 주세요.
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section class="email-stage" data-template="approved">
+            <p class="email-caption">USER_SIGNUP_APPROVED · 회원가입 승인</p>
+            <div class="email-frame">
+                <table class="email-table" role="presentation" cellpadding="0" cellspacing="0">
+                    <tr><td class="brand-line"></td></tr>
+                    <tr>
+                        <td class="email-header-cell">
+                            <div class="brand-lockup">
+                                <div class="brand-name">GIIC</div>
+                                <div class="brand-system">경남지능화혁신사업단 자산관리시스템</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="email-body-cell">
+                            <span class="status-mark green">승인 완료</span>
+                            <h2 class="mail-title">이제 자산관리시스템을<br>이용할 수 있습니다.</h2>
+                            <p class="mail-copy">
+                                <span class="name-strong">김지현님</span>의 회원가입 요청이 승인되었습니다.<br>
+                                가입 시 입력한 사번과 비밀번호로 로그인해 주세요.
+                            </p>
+
+                            <table class="info-card" role="presentation" cellpadding="0" cellspacing="0">
+                                <tr><td class="info-label">사번</td><td class="info-value">2018202</td></tr>
+                                <tr><td class="info-label">부서</td><td class="info-value">경남지능화혁신사업단</td></tr>
+                                <tr><td class="info-label">승인일시</td><td class="info-value">2026. 07. 14. 15:10</td></tr>
+                                <tr><td class="info-label">계정 상태</td><td class="info-value" style="color:#24845a;">사용 가능</td></tr>
+                            </table>
+
+                            <div class="action-wrap">
+                                <a class="action-button" href="http://203.253.164.48:3000/login">자산관리시스템 로그인</a>
+                            </div>
+
+                            <div class="notice-box green">
+                                계정 보호를 위해 비밀번호를 다른 사람과 공유하지 마세요. 본 메일에는 비밀번호가 포함되지 않습니다.
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="email-footer-cell">
+                            <div class="footer-org">GIIC 경남지능화혁신사업단</div>
+                            버튼이 열리지 않으면 브라우저에서 자산관리시스템 주소를 직접 입력해 주세요.
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section class="email-stage" data-template="rejected">
+            <p class="email-caption">USER_SIGNUP_REJECTED · 회원가입 요청 반려</p>
+            <div class="email-frame">
+                <table class="email-table" role="presentation" cellpadding="0" cellspacing="0">
+                    <tr><td class="brand-line"></td></tr>
+                    <tr>
+                        <td class="email-header-cell">
+                            <div class="brand-lockup">
+                                <div class="brand-name">GIIC</div>
+                                <div class="brand-system">경남지능화혁신사업단 자산관리시스템</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="email-body-cell">
+                            <span class="status-mark red">검토 완료</span>
+                            <h2 class="mail-title">회원가입 요청이<br>승인되지 않았습니다.</h2>
+                            <p class="mail-copy">
+                                <span class="name-strong">김지현님</span>의 가입 정보를 검토한 결과, 현재 요청을 승인하기 어려운 것으로 확인되었습니다.
+                                자세한 내용은 사업단 담당자에게 문의해 주세요.
+                            </p>
+
+                            <table class="info-card" role="presentation" cellpadding="0" cellspacing="0">
+                                <tr><td class="info-label">사번</td><td class="info-value">2018202</td></tr>
+                                <tr><td class="info-label">부서</td><td class="info-value">경남지능화혁신사업단</td></tr>
+                                <tr><td class="info-label">처리일시</td><td class="info-value">2026. 07. 14. 15:10</td></tr>
+                                <tr><td class="info-label">처리 결과</td><td class="info-value" style="color:#b34d55;">가입 요청 반려</td></tr>
+                            </table>
+
+                            <div class="notice-box red">
+                                현재 시스템은 반려 사유를 별도로 수집하지 않습니다. 정보 수정이나 재신청이 필요한 경우 담당자 확인 후 진행해 주세요.
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="email-footer-cell">
+                            <div class="footer-org">GIIC 경남지능화혁신사업단</div>
+                            본 메일은 발신 전용입니다. 문의가 필요한 경우 사업단 담당자에게 연락해 주세요.
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section class="email-stage" data-template="super-request">
+            <p class="email-caption">SUPER_NEW_SIGNUP_REQUEST · 신규 회원 승인 요청</p>
+            <div class="email-frame">
+                <table class="email-table" role="presentation" cellpadding="0" cellspacing="0">
+                    <tr><td class="brand-line"></td></tr>
+                    <tr>
+                        <td class="email-header-cell">
+                            <div class="brand-lockup">
+                                <div class="brand-name">GIIC</div>
+                                <div class="brand-system">SUPER ADMIN NOTIFICATION</div>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="email-body-cell">
+                            <span class="status-mark navy">승인 요청</span>
+                            <h2 class="mail-title">새로운 회원가입 요청이<br>도착했습니다.</h2>
+                            <p class="mail-copy">
+                                슈퍼관리자의 확인이 필요한 신규 가입 요청입니다.<br>
+                                아래 신청자 정보를 확인한 뒤 사용자 관리에서 승인 또는 반려해 주세요.
+                            </p>
+
+                            <table class="info-card" role="presentation" cellpadding="0" cellspacing="0">
+                                <tr><td class="info-label">신청자</td><td class="info-value">김지현</td></tr>
+                                <tr><td class="info-label">사번</td><td class="info-value">2018202</td></tr>
+                                <tr><td class="info-label">부서</td><td class="info-value">경남지능화혁신사업단</td></tr>
+                                <tr><td class="info-label">이메일</td><td class="info-value">applicant@example.com</td></tr>
+                                <tr><td class="info-label">요청일시</td><td class="info-value">2026. 07. 14. 14:30</td></tr>
+                            </table>
+
+                            <div class="action-wrap">
+                                <a class="action-button" href="http://203.253.164.48:3000/users?status=PENDING">가입 요청 검토하기</a>
+                            </div>
+
+                            <div class="notice-box">
+                                보안을 위해 메일에서 직접 승인하지 않습니다. 버튼을 누른 뒤 시스템에 로그인하여 최종 처리해 주세요.
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="email-footer-cell">
+                            <div class="footer-org">GIIC 경남지능화혁신사업단</div>
+                            이 메일은 승인된 슈퍼관리자 계정의 등록 이메일에만 발송됩니다.
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+    </main>
+
+    <script>
+        const tabs = document.querySelectorAll('.template-tab');
+        const templates = document.querySelectorAll('.email-stage');
+
+        tabs.forEach((tab) => {
+            tab.addEventListener('click', () => {
+                const target = tab.dataset.target;
+
+                tabs.forEach((item) => item.classList.toggle('active', item === tab));
+                templates.forEach((template) => {
+                    template.classList.toggle('active', template.dataset.template === target);
+                });
+            });
+        });
+    </script>
+</body>
+</html>

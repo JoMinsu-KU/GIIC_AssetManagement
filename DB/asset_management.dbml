@@ -1,0 +1,72 @@
+Table users {
+  employee_no varchar [pk, note: "사번 (로그인 ID)"]
+  password varchar [not null, note: "비밀번호 해시"]
+  name varchar [not null, note: "사용자명"]
+  department varchar [note: "소속 부서"]
+  user_type varchar [note: "직원/교수/외부"]
+  email varchar [unique, note: "이메일"]
+  phone varchar [note: "연락처"]
+  role varchar [not null, note: "SUPER / ADMIN / USER"]
+  status varchar [not null, note: "REQUESTED / APPROVED / BLOCKED"]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table assets {
+  id bigint [pk, increment]
+  asset_no varchar [not null, unique, note: "자산번호 (OCR)"]
+  old_asset_no varchar [note: "구자산번호"]
+  name varchar [not null, note: "물품명 (OCR)"]
+  model varchar [note: "모델명"]
+  serial_no varchar [note: "제조번호"]
+  spec varchar [note: "규격 (OCR)"]
+  value decimal [note: "자산금액"]
+  purchase_date date [not null, note: "취득일자 (OCR)"]
+  disposed_date date [note: "불용일자"]
+  disposed_reason varchar(500) [note: "불용 사유"]
+  status varchar [not null, note: "자산상태"]
+  business_unit varchar [note: "사업장명"]
+  managing_dept varchar [note: "관리부서 (OCR)"]
+  location varchar [note: "비치장소"]
+  current_user_id varchar [note: "현재 사용자 사번"]
+  assigned_at date [note: "배정일자"]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+Table asset_images {
+  id bigint [pk, increment]
+  asset_id bigint [not null, note: "자산 FK"]
+  image_url varchar [not null, note: "이미지 URL"]
+  is_primary boolean [note: "대표 이미지"]
+  uploaded_at timestamp [not null]
+}
+
+Table maintenance_history {
+  id bigint [pk, increment]
+  asset_id bigint [not null, note: "자산 FK"]
+  maintenance_date date [not null, note: "유지/보수 일자"]
+  reason varchar [not null, note: "사유"]
+  details text [note: "상세 내용"]
+  cost decimal [note: "비용"]
+  performed_by varchar [note: "수행자"]
+  created_at timestamp [not null]
+  updated_at timestamp [not null]
+}
+
+// 자산 이관 이력 테이블
+Table asset_transfer_history {
+  id bigint [pk, increment]
+  asset_id bigint [ref: > assets.id, not null]
+  from_user_id varchar(20) [ref: > users.employee_no]
+  to_user_id varchar(20) [ref: > users.employee_no]
+  transfer_date date [not null, default: `CURRENT_DATE`]
+  reason varchar(500)
+  created_at timestamp [default: `CURRENT_TIMESTAMP`]
+  
+  Note: '자산 사용자 이관 이력을 추적합니다'
+}
+
+Ref: assets.current_user_id > users.employee_no
+Ref: asset_images.asset_id > assets.id
+Ref: maintenance_history.asset_id > assets.id

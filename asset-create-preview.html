@@ -1,0 +1,599 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asset Create Preview</title>
+  <style>
+    :root {
+      --bg: #f3f6fb;
+      --surface: #ffffff;
+      --surface-soft: #f7f9fc;
+      --line: #e3eaf4;
+      --line-strong: #d5deea;
+      --text: #1f2a44;
+      --muted: #6f7c92;
+      --primary: #4d7cff;
+      --primary-2: #6a5df6;
+      --danger: #ef6b6b;
+      --shadow: 0 18px 42px rgba(15, 23, 42, 0.06);
+      --radius-xl: 26px;
+      --radius-lg: 18px;
+      --radius-md: 14px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Noto Sans KR", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+    }
+
+    .page {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 44px 28px 56px;
+    }
+
+    .header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      gap: 24px;
+      margin-bottom: 28px;
+    }
+
+    .eyebrow {
+      display: inline-flex;
+      margin-bottom: 12px;
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: #72819a;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 42px;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+    }
+
+    .subtitle {
+      margin: 14px 0 0;
+      max-width: 760px;
+      color: var(--muted);
+      font-size: 17px;
+      line-height: 1.7;
+    }
+
+    .top-actions {
+      display: flex;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .btn {
+      height: 48px;
+      padding: 0 20px;
+      border-radius: 14px;
+      border: 1px solid var(--line-strong);
+      background: #fff;
+      color: #34445f;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .btn-primary {
+      border: none;
+      color: #fff;
+      background: linear-gradient(135deg, var(--primary) 0%, var(--primary-2) 100%);
+      box-shadow: 0 12px 24px rgba(77, 124, 255, 0.18);
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1.5fr) 330px;
+      gap: 22px;
+      align-items: start;
+    }
+
+    .main-stack {
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--line);
+      border-radius: var(--radius-xl);
+      box-shadow: var(--shadow);
+    }
+
+    .panel-inner {
+      padding: 26px 28px;
+    }
+
+    .hero {
+      padding: 26px 28px 24px;
+      background: linear-gradient(180deg, #ffffff 0%, #fbfcff 100%);
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: minmax(0, 1.1fr) minmax(280px, 0.9fr);
+      gap: 18px;
+      align-items: stretch;
+    }
+
+    .hero-title {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .hero-title h2,
+    .section-title {
+      margin: 0;
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .hero-copy {
+      color: var(--muted);
+      font-size: 15px;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .ocr-card {
+      border: 1px solid #dbe4f4;
+      border-radius: 20px;
+      background: linear-gradient(135deg, rgba(77,124,255,0.08) 0%, rgba(106,93,246,0.08) 100%);
+      padding: 18px;
+    }
+
+    .ocr-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .ocr-head strong {
+      font-size: 17px;
+    }
+
+    .ocr-badge {
+      display: inline-flex;
+      align-items: center;
+      height: 30px;
+      padding: 0 12px;
+      border-radius: 999px;
+      background: rgba(77, 124, 255, 0.12);
+      color: #3f65da;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .dropzone {
+      min-height: 168px;
+      border: 1.5px dashed #b9c8df;
+      border-radius: 18px;
+      background: rgba(255,255,255,0.72);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 18px;
+      color: var(--muted);
+    }
+
+    .dropzone strong {
+      display: block;
+      margin-bottom: 10px;
+      font-size: 16px;
+      color: var(--text);
+    }
+
+    .dropzone small {
+      display: block;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+
+    .hero-side {
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: var(--surface-soft);
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+
+    .side-title {
+      font-size: 15px;
+      font-weight: 800;
+      color: #31425e;
+    }
+
+    .hint-list {
+      display: grid;
+      gap: 10px;
+    }
+
+    .hint-item {
+      padding: 14px 14px;
+      border-radius: 16px;
+      background: #fff;
+      border: 1px solid var(--line);
+    }
+
+    .hint-item strong {
+      display: block;
+      margin-bottom: 6px;
+      font-size: 14px;
+    }
+
+    .hint-item span {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    .section-card {
+      padding: 24px 28px 26px;
+    }
+
+    .section-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 18px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .section-caption {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 18px 16px;
+    }
+
+    .form-grid.two {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .form-grid.single {
+      grid-template-columns: 1fr;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .field label {
+      font-size: 13px;
+      font-weight: 800;
+      color: #364762;
+    }
+
+    .field label .req {
+      color: #ff6b6b;
+      margin-left: 4px;
+    }
+
+    .input,
+    .select,
+    .textarea {
+      width: 100%;
+      min-height: 50px;
+      padding: 0 14px;
+      border-radius: 14px;
+      border: 1px solid #d7dfeb;
+      background: #fbfcfe;
+      color: var(--text);
+      font-size: 15px;
+      outline: none;
+    }
+
+    .textarea {
+      min-height: 108px;
+      padding: 14px;
+      resize: vertical;
+    }
+
+    .input:focus,
+    .select:focus,
+    .textarea:focus {
+      border-color: #5e73f7;
+      box-shadow: 0 0 0 4px rgba(94, 115, 247, 0.12);
+      background: #fff;
+    }
+
+    .aside {
+      position: sticky;
+      top: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .summary-card {
+      padding: 22px;
+    }
+
+    .summary-title {
+      margin: 0 0 16px;
+      font-size: 18px;
+      font-weight: 800;
+    }
+
+    .summary-list {
+      display: grid;
+      gap: 12px;
+    }
+
+    .summary-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      padding: 12px 0;
+      border-bottom: 1px solid var(--line);
+      font-size: 14px;
+    }
+
+    .summary-item:last-child { border-bottom: none; }
+
+    .summary-item span { color: var(--muted); }
+    .summary-item strong { color: var(--text); }
+
+    .note-card {
+      padding: 22px;
+      background: linear-gradient(180deg, #ffffff 0%, #fafbff 100%);
+    }
+
+    .note-card p {
+      margin: 0;
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.7;
+    }
+
+    .bottom-bar {
+      position: sticky;
+      bottom: 16px;
+      z-index: 10;
+      margin-top: 18px;
+      padding: 14px 18px;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 18px 42px rgba(15, 23, 42, 0.08);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+
+    .bottom-copy {
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .bottom-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    @media (max-width: 1180px) {
+      .layout,
+      .hero-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .aside {
+        position: static;
+      }
+    }
+
+    @media (max-width: 860px) {
+      .page { padding: 24px 16px 42px; }
+      .header {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .top-actions,
+      .bottom-actions { width: 100%; }
+      .top-actions .btn,
+      .bottom-actions .btn { flex: 1; }
+      .form-grid,
+      .form-grid.two { grid-template-columns: 1fr; }
+      h1 { font-size: 34px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="header">
+      <div>
+        <div class="eyebrow">Asset Create</div>
+        <h1>자산 등록</h1>
+        <p class="subtitle">OCR 보조 기능은 유지하되 화면의 중심은 입력 흐름에 두고, 필수 정보와 검토 포인트가 더 또렷하게 보이도록 정리한 시안입니다.</p>
+      </div>
+      <div class="top-actions">
+        <button class="btn">취소</button>
+        <button class="btn btn-primary">등록</button>
+      </div>
+    </div>
+
+    <div class="layout">
+      <div class="main-stack">
+        <section class="panel hero">
+          <div class="hero-grid">
+            <div>
+              <div class="hero-title">
+                <h2>이미지 OCR 자동 추출</h2>
+                <span class="ocr-badge">보조 입력</span>
+              </div>
+              <div class="hero-copy">라벨 이미지에서 자산번호, 물품명, 모델명 같은 기본값을 먼저 읽어와 입력 시간을 줄이는 영역입니다. 메인 입력보다 튀지 않게 한 단계 차분하게 정리했습니다.</div>
+              <div class="ocr-card">
+                <div class="ocr-head">
+                  <strong>이미지 업로드</strong>
+                  <button class="btn btn-primary" style="height:42px;padding:0 16px;">파일 선택</button>
+                </div>
+                <div class="dropzone">
+                  <strong>자산 라벨 이미지를 올려주세요</strong>
+                  <div>OCR 결과는 아래 입력 필드에 자동으로 채워지는 보조 기능입니다.</div>
+                  <small>JPG, PNG 파일 지원</small>
+                </div>
+              </div>
+            </div>
+            <aside class="hero-side">
+              <div class="side-title">입력 순서 가이드</div>
+              <div class="hint-list">
+                <div class="hint-item">
+                  <strong>1. 기본 정보 확인</strong>
+                  <span>자산번호, 물품명, 모델명은 OCR 결과가 들어와도 한 번 더 검토합니다.</span>
+                </div>
+                <div class="hint-item">
+                  <strong>2. 관리 정보 채우기</strong>
+                  <span>관리부서와 비치장소는 실제 운영 기준에 맞게 직접 확인 후 입력합니다.</span>
+                </div>
+                <div class="hint-item">
+                  <strong>3. 실사용자 정보 선택 입력</strong>
+                  <span>배정 전 자산이면 비워두고 등록해도 되도록 안내를 명확히 둡니다.</span>
+                </div>
+              </div>
+            </aside>
+          </div>
+        </section>
+
+        <section class="panel section-card">
+          <div class="section-head">
+            <h3 class="section-title">기본 정보</h3>
+            <div class="section-caption">등록에 반드시 필요한 식별 정보입니다.</div>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label>자산번호 <span class="req">*</span></label>
+              <input class="input" placeholder="예: 2411309" />
+            </div>
+            <div class="field">
+              <label>물품명 <span class="req">*</span></label>
+              <input class="input" placeholder="예: 모니터" />
+            </div>
+            <div class="field">
+              <label>모델명 <span class="req">*</span></label>
+              <input class="input" placeholder="예: 32UN650K" />
+            </div>
+            <div class="field" style="grid-column: 1 / -1;">
+              <label>규격</label>
+              <input class="input" placeholder="예: 714.3*485.9~595.9*226.7(mm)" />
+            </div>
+          </div>
+        </section>
+
+        <section class="panel section-card">
+          <div class="section-head">
+            <h3 class="section-title">재무 · 관리 정보</h3>
+            <div class="section-caption">회계와 운영 기준에 필요한 필드입니다.</div>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label>취득금액</label>
+              <input class="input" placeholder="0" />
+            </div>
+            <div class="field">
+              <label>취득일자 <span class="req">*</span></label>
+              <input class="input" placeholder="연도-월-일" />
+            </div>
+            <div class="field">
+              <label>상태</label>
+              <select class="select">
+                <option>정상</option>
+                <option>비정상</option>
+                <option>수리중</option>
+              </select>
+            </div>
+            <div class="field">
+              <label>관리부서 <span class="req">*</span></label>
+              <input class="input" placeholder="예: 경남지능화혁신사업단" />
+            </div>
+            <div class="field" style="grid-column: span 2;">
+              <label>비치장소</label>
+              <input class="input" placeholder="예: 제조DX혁신연구실(한마관 지상3층)" />
+            </div>
+          </div>
+        </section>
+
+        <section class="panel section-card">
+          <div class="section-head">
+            <h3 class="section-title">실사용자 정보</h3>
+            <div class="section-caption">배정 전 자산은 비워둘 수 있는 선택 항목입니다.</div>
+          </div>
+          <div class="form-grid">
+            <div class="field">
+              <label>사용자 이름</label>
+              <input class="input" placeholder="예: 조민수" />
+            </div>
+            <div class="field">
+              <label>사용자 부서</label>
+              <input class="input" placeholder="예: IT운영팀" />
+            </div>
+            <div class="field">
+              <label>연락처</label>
+              <input class="input" placeholder="예: 010-0000-0000" />
+            </div>
+          </div>
+        </section>
+
+        <div class="bottom-bar">
+          <div class="bottom-copy">필수 입력값과 OCR 추출값을 확인한 뒤 등록을 진행하는 흐름을 가정한 하단 액션 바입니다.</div>
+          <div class="bottom-actions">
+            <button class="btn">취소</button>
+            <button class="btn btn-primary">자산 등록</button>
+          </div>
+        </div>
+      </div>
+
+      <aside class="aside">
+        <section class="panel summary-card">
+          <h3 class="summary-title">등록 체크</h3>
+          <div class="summary-list">
+            <div class="summary-item"><span>필수 항목</span><strong>3개</strong></div>
+            <div class="summary-item"><span>OCR 보조 입력</span><strong>활성</strong></div>
+            <div class="summary-item"><span>실사용자 정보</span><strong>선택</strong></div>
+            <div class="summary-item"><span>기본 상태</span><strong>정상</strong></div>
+          </div>
+        </section>
+
+        <section class="panel note-card">
+          <h3 class="summary-title">디자인 의도</h3>
+          <p>지금 화면보다 OCR 박스의 존재감을 줄이고, 실제 사용자가 가장 오래 머무르는 입력 섹션의 가독성과 리듬을 높이는 쪽으로 설계했습니다. 오른쪽 요약 패널은 저장 전 점검 포인트를 보여주는 보조 영역입니다.</p>
+        </section>
+      </aside>
+    </div>
+  </div>
+</body>
+</html>

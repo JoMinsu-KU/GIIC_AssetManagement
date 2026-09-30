@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<th:block th:fragment="styles">
+    <style>
+        /* Critical presentation styles are inline because some Korean webmail clients remove head CSS. */
+        @media only screen and (max-width: 680px) {
+            .mail-card { width: 100% !important; border-radius: 8px !important; }
+            .mail-header, .mail-body, .mail-footer { padding-left: 22px !important; padding-right: 22px !important; }
+            .brand-system { display: none !important; }
+            .mail-title { font-size: 23px !important; }
+            .info-label { width: 90px !important; }
+            .mail-space { height: 12px !important; }
+        }
+    </style>
+</th:block>
+
+<th:block th:fragment="header(systemLabel)">
+    <tr><td class="brand-line" height="5" bgcolor="#496fe8" style="height:5px;background-color:#496fe8;font-size:0;line-height:0;">&nbsp;</td></tr>
+    <tr>
+        <td class="mail-header" style="padding:24px 38px 20px;border-bottom:1px solid #edf1f6;background-color:#ffffff;">
+            <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;border-collapse:collapse;border-spacing:0;">
+                <tr>
+                    <td class="brand-name" style="color:#2249ac;font-family:Arial,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;font-size:18px;font-weight:900;line-height:1.4;">GIIC</td>
+                    <td class="brand-system" align="right" style="color:#8792a5;font-family:Arial,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;font-size:12px;line-height:1.4;text-align:right;" th:text="${systemLabel}">경남지능화혁신사업단 자산관리시스템</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</th:block>
+
+<th:block th:fragment="footer(note)">
+    <tr>
+        <td class="mail-footer" bgcolor="#f8fafc" style="padding:22px 38px 26px;border-top:1px solid #edf1f6;background-color:#f8fafc;color:#929daf;font-family:Arial,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;font-size:11px;line-height:1.7;">
+            <div class="footer-org" style="margin:0 0 4px;color:#66738a;font-size:12px;font-weight:800;">GIIC 경남지능화혁신사업단</div>
+            <span th:text="${note}">본 메일은 발신 전용입니다.</span>
+        </td>
+    </tr>
+</th:block>
+</body>
+</html>

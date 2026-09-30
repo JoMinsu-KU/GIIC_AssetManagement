@@ -1,0 +1,202 @@
+/* Transfer List Page */
+.transfer-list-page {
+    width: 100%;
+}
+
+.transfer-list-page .transfer-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.transfer-list-page .transfer-filter-section {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-end;
+}
+
+.transfer-list-page .transfer-filter-select {
+    width: 180px;
+    min-width: 180px;
+    height: 44px;
+}
+
+.transfer-table-container {
+    width: 100%;
+    overflow-x: auto;
+    scrollbar-gutter: stable;
+}
+
+.transfer-table {
+    min-width: 1180px;
+    table-layout: fixed;
+}
+
+.transfer-table .transfer-col-asset-name {
+    width: 11%;
+}
+
+.transfer-table .transfer-col-asset-no {
+    width: 8%;
+}
+
+.transfer-table .transfer-col-requester {
+    width: 7%;
+}
+
+.transfer-table .transfer-col-recipient {
+    width: 27%;
+}
+
+.transfer-table .transfer-col-location {
+    width: 19%;
+}
+
+.transfer-table .transfer-col-date {
+    width: 9%;
+}
+
+.transfer-table .transfer-col-status {
+    width: 7%;
+}
+
+.transfer-table .transfer-col-actions {
+    width: 12%;
+}
+
+.transfer-table th,
+.transfer-table td {
+    vertical-align: middle;
+}
+
+.transfer-table tbody tr {
+    cursor: default;
+}
+
+.transfer-table .transfer-cell-asset-name,
+.transfer-table .transfer-cell-content {
+    line-height: 1.55;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
+}
+
+.transfer-table .transfer-cell-asset-name {
+    font-weight: 650;
+    white-space: nowrap;
+}
+
+.transfer-table .transfer-cell-nowrap,
+.transfer-table .transfer-cell-status,
+.transfer-table .transfer-cell-actions {
+    white-space: nowrap;
+}
+
+.transfer-table .transfer-cell-status,
+.transfer-table .transfer-cell-actions {
+    text-align: left;
+}
+
+/* Status Badges */
+.transfer-list-page .status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 4px 8px;
+    min-height: 28px;
+    border-radius: 7px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.status-pending {
+    background-color: #fef3c7;
+    color: #d97706;
+}
+
+.status-approved {
+    background-color: #dcfce7;
+    color: #16a34a;
+}
+
+.status-rejected {
+    background-color: #fee2e2;
+    color: #dc2626;
+}
+
+/* Action Buttons */
+.transfer-list-page .action-buttons {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+}
+
+.transfer-list-page .btn-approve,
+.transfer-list-page .btn-reject {
+    min-width: 52px;
+    height: 34px;
+    padding: 0 12px;
+    border-radius: 8px;
+    border: none;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+    cursor: pointer;
+    transition: background-color 0.16s ease, border-color 0.16s ease;
+}
+
+.transfer-list-page .btn-approve {
+    background-color: #dcfce7;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+}
+
+.transfer-list-page .btn-reject {
+    background-color: #fee2e2;
+    color: #dc2626;
+    border: 1px solid #fecaca;
+}
+
+.transfer-list-page .btn-approve:hover {
+    background-color: #c8f5d8;
+}
+
+.transfer-list-page .btn-reject:hover {
+    background-color: #ffd6d6;
+}
+
+.transfer-list-page .reject-reason {
+    display: inline-flex;
+    align-items: center;
+    min-height: 32px;
+    padding: 0 10px;
+    border: 1px solid #d8dee8;
+    border-radius: 8px;
+    background: #fff;
+    font-size: 12px;
+    font-weight: 650;
+    color: #5f6b7b;
+    cursor: help;
+    text-decoration: none;
+    white-space: nowrap;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .transfer-list-page .transfer-filter-section {
+        justify-content: stretch;
+    }
+
+    .transfer-list-page .transfer-filter-select {
+        width: 100%;
+        min-width: 0;
+    }
+
+    .transfer-list-page .action-buttons {
+        flex-direction: row;
+    }
+}

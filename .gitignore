@@ -1,0 +1,56 @@
+HELP.md
+.env
+.env.*
+!.env.example
+application-*.local.properties
+.gradle
+build/
+!gradle/wrapper/gradle-wrapper.jar
+!**/src/main/**/build/
+!**/src/test/**/build/
+
+### STS ###
+.apt_generated
+.classpath
+.factorypath
+.project
+.settings
+.springBeans
+.sts4-cache
+bin/
+!**/src/main/**/bin/
+!**/src/test/**/bin/
+
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### NetBeans ###
+/nbproject/private/
+/nbbuild/
+/dist/
+/nbdist/
+/.nb-gradle/
+
+### VS Code ###
+.vscode/
+
+### Runtime and operational data ###
+uploads/
+outputs/
+Asset_Data/
+tmp/
+*.log
+__pycache__/
+*.py[cod]
+
+### Local source data and reference documents ###
+*.xlsx
+*.xls
+*.pdf
+DB/init/10_asset_migration.sql

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회원가입 요청 반려</title>
+    <th:block th:replace="~{mail/fragments :: styles}"></th:block>
+</head>
+<body style="margin:0;padding:0;background-color:#eef2f7;color:#17233b;font-family:Arial,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;">
+<table class="mail-wrap" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#eef2f7" style="width:100%;border-collapse:collapse;border-spacing:0;background-color:#eef2f7;">
+    <tr><td class="mail-space" height="32" style="height:32px;font-size:0;line-height:0;">&nbsp;</td></tr>
+    <tr>
+        <td align="center">
+            <table class="mail-card" role="presentation" width="640" cellpadding="0" cellspacing="0" border="0" bgcolor="#ffffff" style="width:640px;max-width:640px;border:1px solid #dce3ec;border-collapse:separate;border-spacing:0;border-radius:14px;background-color:#ffffff;overflow:hidden;">
+                <th:block th:replace="~{mail/fragments :: header('경남지능화혁신사업단 자산관리시스템')}"></th:block>
+                <tr>
+                    <td class="mail-body" style="padding:42px 38px 36px;background-color:#ffffff;font-family:Arial,'Apple SD Gothic Neo','Noto Sans KR',sans-serif;">
+                        <span class="status status-red" style="display:inline-block;margin:0 0 18px;padding:7px 11px;border-radius:999px;background-color:#fff0f1;color:#b34d55;font-size:12px;font-weight:800;line-height:1.4;">검토 완료</span>
+                        <h1 class="mail-title" style="margin:0;color:#17233b;font-size:27px;font-weight:800;line-height:1.35;letter-spacing:-0.5px;">회원가입 요청이<br>승인되지 않았습니다.</h1>
+                        <p class="mail-copy" style="margin:16px 0 0;color:#647188;font-size:15px;line-height:1.75;">
+                            <span class="name-strong" style="color:#273958;font-weight:800;" th:text="|${name}님|">사용자님</span>의 가입 정보를 검토한 결과, 현재 요청을 승인하기 어려운 것으로 확인되었습니다.
+                            자세한 내용은 사업단 담당자에게 문의해 주세요.
+                        </p>
+                        <table class="info-card" role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" bgcolor="#f9fbfd" style="width:100%;margin-top:28px;border:1px solid #e2e8f1;border-collapse:separate;border-spacing:0;border-radius:10px;background-color:#f9fbfd;">
+                            <tr><td class="info-label" width="116" style="width:116px;padding:12px 16px;border-bottom:1px solid #e8edf4;color:#7c899d;font-size:13px;font-weight:700;line-height:1.5;">사번</td><td class="info-value" style="padding:12px 16px;border-bottom:1px solid #e8edf4;color:#263652;font-size:13px;font-weight:700;line-height:1.5;" th:text="${employeeNo}">-</td></tr>
+                            <tr><td class="info-label" width="116" style="width:116px;padding:12px 16px;border-bottom:1px solid #e8edf4;color:#7c899d;font-size:13px;font-weight:700;line-height:1.5;">부서</td><td class="info-value" style="padding:12px 16px;border-bottom:1px solid #e8edf4;color:#263652;font-size:13px;font-weight:700;line-height:1.5;" th:text="${department}">-</td></tr>
+                            <tr><td class="info-label" width="116" style="width:116px;padding:12px 16px;border-bottom:1px solid #e8edf4;color:#7c899d;font-size:13px;font-weight:700;line-height:1.5;">처리일시</td><td class="info-value" style="padding:12px 16px;border-bottom:1px solid #e8edf4;color:#263652;font-size:13px;font-weight:700;line-height:1.5;" th:text="${formattedDate}">-</td></tr>
+                            <tr><td class="info-label" width="116" style="width:116px;padding:12px 16px;color:#7c899d;font-size:13px;font-weight:700;line-height:1.5;">처리 결과</td><td class="info-value" style="padding:12px 16px;color:#b34d55;font-size:13px;font-weight:700;line-height:1.5;">가입 요청 반려</td></tr>
+                        </table>
+                        <div class="notice notice-red" style="margin-top:22px;padding:14px 16px;border-left:3px solid #d7a0a5;background-color:#fff7f7;color:#69768a;font-size:12px;line-height:1.65;">현재 시스템은 반려 사유를 별도로 수집하지 않습니다. 정보 수정이나 재신청이 필요한 경우 담당자 확인 후 진행해 주세요.</div>
+                    </td>
+                </tr>
+                <th:block th:replace="~{mail/fragments :: footer('본 메일은 발신 전용입니다. 문의가 필요한 경우 사업단 담당자에게 연락해 주세요.')}"></th:block>
+            </table>
+        </td>
+    </tr>
+    <tr><td class="mail-space" height="32" style="height:32px;font-size:0;line-height:0;">&nbsp;</td></tr>
+</table>
+</body>
+</html>

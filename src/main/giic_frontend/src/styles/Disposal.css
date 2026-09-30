@@ -1,0 +1,19 @@
+.status-badge.status-disposal-pending {
+    background-color: #fff3cd;
+    color: #856404;
+    border: 1px solid #ffeeba;
+}
+
+.status-badge.status-disposed {
+    background-color: #e2e8f0;
+    color: #64748b;
+    border: 1px solid #64748b;
+}
+
+.status-badge.status-disposal-rejected {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Re-use existing badge styles or ensure these are added */

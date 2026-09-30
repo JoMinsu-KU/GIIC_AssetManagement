@@ -1,0 +1,435 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>GIIC UI Concept Preview</title>
+  <style>
+    :root {
+      --bg: #f4f7fb;
+      --panel: #ffffff;
+      --line: #e5ebf4;
+      --text: #1c2740;
+      --muted: #6e7c96;
+      --accent-1: #4b7cff;
+      --accent-2: #7a5cff;
+      --accent-soft: #f1f5ff;
+      --success-bg: #e9f8ef;
+      --success-text: #1f8f51;
+      --warning-bg: #fff4df;
+      --warning-text: #b7791f;
+      --shadow: 0 14px 30px rgba(28, 39, 64, 0.06);
+      --radius-lg: 20px;
+      --radius-md: 16px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: "Segoe UI", "Apple SD Gothic Neo", "Noto Sans KR", sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(75, 124, 255, 0.035), transparent 24%),
+        linear-gradient(180deg, #f8fbff 0%, var(--bg) 100%);
+      color: var(--text);
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 5;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 18px 32px;
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(229, 235, 244, 0.9);
+    }
+
+    .brand { display: flex; align-items: center; gap: 14px; }
+
+    .brand-mark {
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      background: linear-gradient(135deg, var(--accent-1), var(--accent-2));
+      box-shadow: 0 8px 18px rgba(86, 104, 255, 0.18);
+    }
+
+    .brand h1 { margin: 0; font-size: 23px; line-height: 1.1; }
+    .brand p { margin: 4px 0 0; color: var(--muted); font-size: 13px; }
+
+    .nav { display: flex; gap: 10px; }
+
+    .nav a {
+      text-decoration: none;
+      color: #40506b;
+      padding: 11px 16px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 15px;
+    }
+
+    .nav a.active {
+      color: #2347c5;
+      background: linear-gradient(180deg, #eef4ff 0%, #e8efff 100%);
+      box-shadow: inset 0 0 0 1px rgba(75, 124, 255, 0.08);
+    }
+
+    .actions { display: flex; align-items: center; gap: 14px; }
+
+    .user-chip {
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.94);
+      color: var(--muted);
+      font-size: 14px;
+    }
+
+    .btn-primary {
+      border: 0;
+      color: white;
+      padding: 15px 28px;
+      border-radius: 16px;
+      font-size: 17px;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+      box-shadow: 0 10px 22px rgba(86, 104, 255, 0.22);
+    }
+
+    .btn-ghost {
+      border: 1px solid var(--line);
+      background: white;
+      color: #4c5c77;
+      padding: 12px 18px;
+      border-radius: 14px;
+      font-weight: 700;
+    }
+
+    .wrap {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 40px 32px 48px;
+    }
+
+    .hero {
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 24px;
+      margin-bottom: 26px;
+    }
+
+    .hero h2 { margin: 0; font-size: 40px; letter-spacing: -0.04em; }
+    .hero p { margin: 12px 0 0; color: var(--muted); font-size: 18px; }
+    .hero strong { color: #2f5ae7; }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: var(--panel);
+      border: 1px solid rgba(229, 235, 244, 0.92);
+      border-radius: var(--radius-lg);
+      box-shadow: var(--shadow);
+    }
+
+    .metric {
+      padding: 24px;
+      min-height: 138px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .metric.emphasis {
+      border-color: rgba(75, 124, 255, 0.16);
+      box-shadow: 0 16px 34px rgba(75, 124, 255, 0.08);
+    }
+
+    .metric.emphasis::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 4px;
+      background: linear-gradient(90deg, var(--accent-1), var(--accent-2));
+    }
+
+    .metric-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 16px;
+      background: var(--accent-soft);
+      display: grid;
+      place-items: center;
+      font-size: 18px;
+      color: #3959d7;
+      flex-shrink: 0;
+    }
+
+    .metric h3 { margin: 0 0 8px; font-size: 14px; opacity: 0.74; }
+    .metric .value { font-size: 36px; font-weight: 900; letter-spacing: -0.05em; margin: 0; }
+    .metric .meta { margin-top: 6px; opacity: 0.66; font-size: 12px; }
+
+    .layout-grid {
+      display: grid;
+      grid-template-columns: 1.7fr 1fr;
+      gap: 22px;
+      margin-bottom: 24px;
+    }
+
+    .section-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 24px 28px 16px;
+    }
+
+    .section-head h3 { margin: 0; font-size: 24px; letter-spacing: -0.03em; }
+    .section-head span { color: #3e63eb; font-weight: 700; }
+
+    table { width: 100%; border-collapse: collapse; }
+    th, td {
+      text-align: left;
+      padding: 18px 28px;
+      border-top: 1px solid #edf1f7;
+      font-size: 15px;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 13px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      background: #fbfcff;
+    }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-weight: 800;
+      font-size: 12px;
+    }
+
+    .status.success { background: var(--success-bg); color: var(--success-text); }
+    .status.warning { background: var(--warning-bg); color: var(--warning-text); }
+
+    .mini-panel { padding: 24px 28px; }
+
+    .ring-wrap {
+      display: flex;
+      align-items: center;
+      gap: 28px;
+      padding-top: 8px;
+    }
+
+    .ring {
+      width: 196px;
+      height: 196px;
+      border-radius: 50%;
+      background:
+        radial-gradient(closest-side, white 68%, transparent 69% 100%),
+        conic-gradient(#18be84 0 82%, #4b7cff 82% 92%, #f1a81a 92% 97%, #d2dae7 97% 100%);
+      display: grid;
+      place-items: center;
+      flex-shrink: 0;
+    }
+
+    .ring strong { display: block; font-size: 38px; text-align: center; }
+    .ring span { display: block; margin-top: 6px; color: var(--muted); text-align: center; }
+
+    .legend { display: grid; gap: 14px; width: 100%; }
+
+    .legend-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 0;
+      border-bottom: 1px solid #eef2f8;
+    }
+
+    .legend-item:last-child { border-bottom: 0; }
+    .legend-label { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+
+    .dot { width: 12px; height: 12px; border-radius: 50%; }
+    .footer-note { color: var(--muted); font-size: 14px; padding: 0 4px; }
+
+    @media (max-width: 1200px) {
+      .summary-grid,
+      .layout-grid { grid-template-columns: 1fr; }
+      .topbar,
+      .hero { flex-direction: column; align-items: flex-start; }
+      .nav { flex-wrap: wrap; }
+      .ring-wrap { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-mark"></div>
+      <div>
+        <h1>GIIC 자산 관리</h1>
+        <p>차분한 배경 위에 선명한 행동 포인트만 남긴 방향</p>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a class="active" href="#">대시보드</a>
+      <a href="#">자산 관리</a>
+      <a href="#">유지보수</a>
+      <a href="#">사용자 관리</a>
+      <a href="#">시스템 설정</a>
+    </nav>
+
+    <div class="actions">
+      <div class="user-chip">조민수 · 슈퍼관리자</div>
+      <button class="btn-ghost">로그아웃</button>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <h2>대시보드</h2>
+        <p>안녕하세요, <strong>조민수</strong>님. 지금 필요한 현황과 작업 진입점만 남겨 더 단정하게 정리했습니다.</p>
+      </div>
+      <button class="btn-primary">+ 자산 등록</button>
+    </section>
+
+    <section class="summary-grid">
+      <article class="metric emphasis card">
+        <div class="metric-icon">◆</div>
+        <div>
+          <h3>전체 자산</h3>
+          <p class="value">601</p>
+          <div class="meta">현재 시스템에 등록된 전체 자산 수</div>
+        </div>
+      </article>
+
+      <article class="metric card">
+        <div class="metric-icon">●</div>
+        <div>
+          <h3>정상 / 사용중</h3>
+          <p class="value" style="color:#18a96f;">593</p>
+          <div class="meta">안정적으로 운영 중인 자산</div>
+        </div>
+      </article>
+
+      <article class="metric card">
+        <div class="metric-icon">⌁</div>
+        <div>
+          <h3>수리중</h3>
+          <p class="value" style="color:#e29612;">5</p>
+          <div class="meta">정비 프로세스가 진행 중인 자산</div>
+        </div>
+      </article>
+
+      <article class="metric card">
+        <div class="metric-icon">◴</div>
+        <div>
+          <h3>이관 대기</h3>
+          <p class="value" style="color:#4b7cff;">3</p>
+          <div class="meta">검토와 승인 대기 중인 요청</div>
+        </div>
+      </article>
+    </section>
+
+    <section class="layout-grid">
+      <article class="card">
+        <div class="section-head">
+          <h3>최근 등록 자산</h3>
+          <span>전체 보기</span>
+        </div>
+        <table>
+          <thead>
+            <tr>
+              <th>자산명</th>
+              <th>상태</th>
+              <th>등록일</th>
+              <th>실사용자</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>사무용 의자</td>
+              <td><span class="status success">정상</span></td>
+              <td>2026-03-11</td>
+              <td>-</td>
+            </tr>
+            <tr>
+              <td>32인치 모니터</td>
+              <td><span class="status success">정상</span></td>
+              <td>2026-03-11</td>
+              <td>민수</td>
+            </tr>
+            <tr>
+              <td>컬러 복합기</td>
+              <td><span class="status warning">점검중</span></td>
+              <td>2026-03-10</td>
+              <td>경영지원팀</td>
+            </tr>
+            <tr>
+              <td>업무용 노트북</td>
+              <td><span class="status success">정상</span></td>
+              <td>2026-03-10</td>
+              <td>조민수</td>
+            </tr>
+          </tbody>
+        </table>
+      </article>
+
+      <article class="card mini-panel">
+        <div class="section-head" style="padding:0 0 18px;">
+          <h3>자산 현황</h3>
+          <span>상세 분석</span>
+        </div>
+        <div class="ring-wrap">
+          <div class="ring">
+            <div>
+              <strong>601</strong>
+              <span>Total Assets</span>
+            </div>
+          </div>
+
+          <div class="legend">
+            <div class="legend-item">
+              <div class="legend-label"><span class="dot" style="background:#18be84;"></span> 정상/사용중</div>
+              <strong>593</strong>
+            </div>
+            <div class="legend-item">
+              <div class="legend-label"><span class="dot" style="background:#4b7cff;"></span> 이관대기</div>
+              <strong>3</strong>
+            </div>
+            <div class="legend-item">
+              <div class="legend-label"><span class="dot" style="background:#f1a81a;"></span> 수리중</div>
+              <strong>5</strong>
+            </div>
+            <div class="legend-item">
+              <div class="legend-label"><span class="dot" style="background:#d2dae7;"></span> 폐기</div>
+              <strong>0</strong>
+            </div>
+          </div>
+        </div>
+      </article>
+    </section>
+
+    <div class="footer-note">
+      검색은 대시보드에서 제거하고, 핵심 현황과 주요 행동만 남겨 더 정제된 업무형 화면으로 정리한 시안입니다.
+    </div>
+  </main>
+</body>
+</html>

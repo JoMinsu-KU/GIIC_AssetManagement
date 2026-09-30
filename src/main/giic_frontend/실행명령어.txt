@@ -1,0 +1,7 @@
+백엔드
+cd C:\Users\choiLee\GIIC_Asset
+.\gradlew.bat bootRun
+
+프론트
+cd C:\Users\choiLee\GIIC_Asset\src\main\giic_frontend
+npm start
