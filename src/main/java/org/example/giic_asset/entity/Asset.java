@@ -41,6 +41,10 @@ public class Asset extends BaseEntity {
     @Column(nullable = false)
     private AssetStatus status;
 
+    @Column(nullable = false)
+    @Builder.Default
+    private boolean sharedUse = false;
+
     // === NEW FIELDS FOR ACTUAL USER (실사용자) ===
     @Column(length = 100)
     private String actualUserName; // Can be anyone - internal or external
@@ -150,6 +154,13 @@ public class Asset extends BaseEntity {
         this.actualUserName = name;
         this.actualUserDepartment = department;
         this.actualUserContact = contact;
+    }
+
+    public void setSharedUse(boolean sharedUse) {
+        this.sharedUse = sharedUse;
+        if (sharedUse) {
+            updateActualUser(null, null, null);
+        }
     }
 
     public void markTransferPending() {

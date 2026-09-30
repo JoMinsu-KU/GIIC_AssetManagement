@@ -26,6 +26,7 @@ public class AssetResponse {
     private String managingDept;
     private String location;
     private AssetStatus status;
+    private boolean sharedUse;
     private LocalDateTime createdAt;
 
     // === NEW FIELDS ===
@@ -68,6 +69,7 @@ public class AssetResponse {
                 .managingDept(asset.getManagingDept())
                 .location(asset.getLocation())
                 .status(asset.getStatus())
+                .sharedUse(asset.isSharedUse())
                 .createdAt(asset.getCreatedAt())
                 // New fields
                 .actualUserName(asset.getActualUserName())

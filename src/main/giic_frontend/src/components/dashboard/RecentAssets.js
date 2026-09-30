@@ -29,7 +29,8 @@ const RecentAssets = () => {
     const getStatusLabel = (status) => {
         const labels = {
             NORMAL: '정상',
-            ABNORMAL: '비정상',
+            ABNORMAL: '고장',
+            UNUSED: '미사용',
             DISPOSED: '폐기',
             REPAIRING: '수리중',
             TRANSFER_PENDING: '이관 대기',
@@ -45,6 +46,7 @@ const RecentAssets = () => {
         const classes = {
             NORMAL: 'status-normal',
             ABNORMAL: 'status-abnormal',
+            UNUSED: 'status-unused',
             DISPOSED: 'status-disposed',
             REPAIRING: 'status-repairing',
             TRANSFER_PENDING: 'status-transfer-pending',

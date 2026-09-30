@@ -7,11 +7,13 @@ import org.example.giic_asset.dto.asset.*;
 import org.example.giic_asset.dto.maintenance.MaintenanceRejectRequest;
 import org.example.giic_asset.entity.Asset;
 import org.example.giic_asset.entity.AssetImage;
+import org.example.giic_asset.entity.AssetUsageChangeHistory;
 import org.example.giic_asset.entity.User;
 import org.example.giic_asset.entity.enums.AssetStatus;
 import org.example.giic_asset.repository.AssetImageRepository;
 import org.example.giic_asset.repository.AssetLossRequestRepository;
 import org.example.giic_asset.repository.AssetRepository;
+import org.example.giic_asset.repository.AssetUsageChangeHistoryRepository;
 import org.example.giic_asset.repository.AssetSpecifications;
 import org.example.giic_asset.repository.DisposalRepository;
 import org.example.giic_asset.repository.MaintenanceRepository;
@@ -51,6 +53,7 @@ public class AssetService {
             "image/jpeg", "image/jpg", "image/png", "image/webp");
 
     private final AssetRepository assetRepository;
+    private final AssetUsageChangeHistoryRepository assetUsageChangeHistoryRepository;
     private final AssetImageRepository assetImageRepository;
     private final TransferRepository transferRepository;
     private final MaintenanceRepository maintenanceRepository;
@@ -67,11 +70,21 @@ public class AssetService {
         if (request.getStatus() == AssetStatus.LOST || request.getStatus() == AssetStatus.LOSS_PENDING) {
             throw new BaseException(ErrorCode.INVALID_REQUEST, "손망 상태는 승인 절차를 통해서만 지정할 수 있습니다.");
         }
+        if (request.getStatus() == AssetStatus.UNUSED && isBlank(request.getLocation())) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "미사용 자산은 비치장소가 필요합니다.");
+        }
         if (assetRepository.existsByAssetNo(request.getAssetNo())) {
             log.warn("Duplicate asset number: {}", request.getAssetNo());
             throw new BaseException(ErrorCode.DUPLICATE, "이미 존재하는 자산번호입니다.");
         }
-        Asset savedAsset = assetRepository.save(request.toEntity(registrar));
+        Asset newAsset = request.toEntity(registrar);
+        if (request.getStatus() == AssetStatus.UNUSED) {
+            newAsset.updateActualUser(null, null, null);
+            newAsset.setSharedUse(false);
+        } else if (newAsset.isSharedUse()) {
+            newAsset.updateActualUser(null, null, null);
+        }
+        Asset savedAsset = assetRepository.save(newAsset);
         log.info("Asset created successfully with ID: {}", savedAsset.getId());
         return savedAsset.getId();
     }
@@ -171,22 +184,50 @@ public class AssetService {
                     return new BaseException(ErrorCode.NOT_FOUND, "자산을 찾을 수 없습니다.");
                 });
         AssetStatus requestedStatus = request.getStatus();
+        AssetStatus nextStatus = requestedStatus == null ? asset.getStatus() : requestedStatus;
         if (requestedStatus != null
                 && requestedStatus != asset.getStatus()
                 && (requestedStatus == AssetStatus.LOST || requestedStatus == AssetStatus.LOSS_PENDING)) {
             throw new BaseException(ErrorCode.INVALID_REQUEST, "손망 상태는 승인 절차를 통해서만 지정할 수 있습니다.");
         }
+        if (nextStatus == AssetStatus.UNUSED
+                && isBlank(request.getLocation() == null ? asset.getLocation() : request.getLocation())) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "미사용 자산은 비치장소가 필요합니다.");
+        }
+        if (asset.getStatus() == AssetStatus.UNUSED && nextStatus == AssetStatus.NORMAL
+                && !Boolean.TRUE.equals(request.getSharedUse()) && isBlank(request.getActualUserName())) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "사용중으로 변경하려면 실사용자 이름을 입력해 주세요.");
+        }
+        if (Boolean.TRUE.equals(request.getSharedUse()) && !asset.isSharedUse()
+                && (asset.getStatus() != AssetStatus.NORMAL || nextStatus != AssetStatus.NORMAL)) {
+            throw new BaseException(ErrorCode.BAD_REQUEST, "정상 자산만 공용 자산으로 변경할 수 있습니다.");
+        }
+        if (Boolean.TRUE.equals(request.getSharedUse()) && !asset.isSharedUse()) {
+            assetUsageChangeHistoryRepository.save(AssetUsageChangeHistory.forSharedUseEdit(asset));
+        }
         asset.update(request.getName(), request.getModel(), request.getSpec(), request.getPurchaseDate(),
                 request.getValue(), request.getManagingDept(), request.getLocation(), request.getStatus());
 
-        // Update actual user information
-        if (request.getActualUserName() != null ||
+        if (nextStatus == AssetStatus.UNUSED) {
+            asset.updateActualUser(null, null, null);
+            asset.setSharedUse(false);
+        } else if (Boolean.TRUE.equals(request.getSharedUse())) {
+            asset.setSharedUse(true);
+        } else if (asset.isSharedUse() && request.getSharedUse() == null) {
+            // Older clients omit sharedUse; do not turn an imported shared asset into an assigned one.
+            asset.updateActualUser(null, null, null);
+        } else if (request.getActualUserName() != null ||
                 request.getActualUserDepartment() != null ||
                 request.getActualUserContact() != null) {
+            if (Boolean.FALSE.equals(request.getSharedUse()) || !isBlank(request.getActualUserName())) {
+                asset.setSharedUse(false);
+            }
             asset.updateActualUser(
                     request.getActualUserName(),
                     request.getActualUserDepartment(),
                     request.getActualUserContact());
+        } else if (Boolean.FALSE.equals(request.getSharedUse())) {
+            asset.setSharedUse(false);
         }
     }
 
@@ -330,6 +371,10 @@ public class AssetService {
         if (contentType == null || !ALLOWED_IMAGE_TYPES.contains(contentType.toLowerCase(Locale.ROOT))) {
             throw new BaseException(ErrorCode.INVALID_IMAGE_FORMAT, "JPG, PNG, WEBP 이미지만 등록할 수 있습니다.");
         }
+    }
+
+    private static boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 
     private StoredImage storeImage(MultipartFile file) {

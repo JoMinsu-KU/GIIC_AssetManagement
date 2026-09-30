@@ -3,6 +3,7 @@ package org.example.giic_asset.entity.enums;
 public enum AssetStatus {
     NORMAL, // 정상/사용중
     ABNORMAL, // 비정상/고장
+    UNUSED, // 미사용/미배정
     DISPOSED, // 폐기
     REPAIRING, // 수리중
     TRANSFER_PENDING, // 이관 대기중

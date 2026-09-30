@@ -14,6 +14,7 @@ const MainPage = () => {
         total: 0,
         normal: 0,
         abnormal: 0,
+        unused: 0,
         repairing: 0,
         disposed: 0,
         transferPending: 0,
@@ -33,6 +34,7 @@ const MainPage = () => {
                 const total = assets.length;
                 const normal = assets.filter(a => a.status === 'NORMAL').length;
                 const abnormal = assets.filter(a => a.status === 'ABNORMAL').length;
+                const unused = assets.filter(a => a.status === 'UNUSED').length;
                 const repairing = assets.filter(a => a.status === 'REPAIRING').length;
                 const disposed = assets.filter(a => a.status === 'DISPOSED').length;
                 const transferPending = assets.filter(a => a.status === 'TRANSFER_PENDING').length;
@@ -45,6 +47,7 @@ const MainPage = () => {
                     total,
                     normal,
                     abnormal,
+                    unused,
                     repairing,
                     disposed,
                     transferPending,
@@ -149,7 +152,7 @@ const MainPage = () => {
                                 <span>집계 중</span>
                             ) : (
                                 <>
-                                    <span>비정상 {stats.abnormal}</span>
+                                    <span>고장 {stats.abnormal}</span>
                                     <span>반려 {stats.disposalRejected}</span>
                                 </>
                             )}

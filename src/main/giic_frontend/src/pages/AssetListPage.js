@@ -72,7 +72,8 @@ const AssetListPage = () => {
     const getStatusLabel = (status) => {
         const labels = {
             NORMAL: '정상',
-            ABNORMAL: '비정상',
+            ABNORMAL: '고장',
+            UNUSED: '미사용',
             DISPOSED: '폐기',
             REPAIRING: '수리중',
             TRANSFER_PENDING: '이관 대기',
@@ -88,6 +89,7 @@ const AssetListPage = () => {
         const classes = {
             NORMAL: 'status-normal',
             ABNORMAL: 'status-abnormal',
+            UNUSED: 'status-unused',
             DISPOSED: 'status-disposed',
             REPAIRING: 'status-repairing',
             TRANSFER_PENDING: 'status-transfer-pending',
@@ -252,7 +254,7 @@ const AssetListPage = () => {
                                 type="text"
                                 name="keyword"
                                 className="form-input asset-list-input"
-                                placeholder="자산번호, 물품명, 모델명, 실사용자명"
+                                placeholder="자산번호, 물품명, 모델명, 실사용자명, 공용"
                                 value={filters.keyword}
                                 onChange={handleFilterChange}
                             />
@@ -267,7 +269,8 @@ const AssetListPage = () => {
                             >
                                 <option value="">전체</option>
                                 <option value="NORMAL">정상</option>
-                                <option value="ABNORMAL">비정상</option>
+                                <option value="ABNORMAL">고장</option>
+                                <option value="UNUSED">미사용</option>
                                 <option value="DISPOSED">폐기</option>
                                 <option value="REPAIRING">수리중</option>
                                 <option value="TRANSFER_PENDING">이관 대기</option>
@@ -402,8 +405,10 @@ const AssetListPage = () => {
                                             <td className="asset-list-location" title={asset.location || ''}>
                                                 <span className="asset-list-clamped-text">{asset.location || '-'}</span>
                                             </td>
-                                            <td className="asset-list-user-cell" title={asset.actualUserName || ''}>
-                                                {asset.actualUserName || '-'}
+                                            <td className="asset-list-user-cell" title={asset.sharedUse ? '공용 자산' : (asset.actualUserName || '')}>
+                                                {asset.sharedUse
+                                                    ? <span className="asset-usage-badge">공용</span>
+                                                    : (asset.actualUserName || '-')}
                                             </td>
                                             <td className="asset-list-date-cell">{formatDate(asset.createdAt)}</td>
                                         </tr>

@@ -21,7 +21,8 @@ import '../styles/Asset.css';
 const getStatusLabel = (status) => {
     switch (status) {
         case 'NORMAL': return '정상';
-        case 'ABNORMAL': return '비정상';
+        case 'ABNORMAL': return '고장';
+        case 'UNUSED': return '미사용';
         case 'DISPOSED': return '폐기';
         case 'REPAIRING': return '수리중';
         case 'TRANSFER_PENDING': return '이관 대기';
@@ -37,6 +38,7 @@ const getStatusClass = (status) => {
     switch (status) {
         case 'NORMAL': return 'status-normal';
         case 'ABNORMAL': return 'status-abnormal';
+        case 'UNUSED': return 'status-unused';
         case 'DISPOSED': return 'status-disposed';
         case 'REPAIRING': return 'status-repairing';
         case 'TRANSFER_PENDING': return 'status-transfer-pending';
@@ -149,8 +151,13 @@ const AssetDetailPage = () => {
         const { name, value } = e.target;
         setFormData((prev) => ({
             ...prev,
-            [name]: value
+            [name]: value,
+            ...(name === 'status' && value !== 'NORMAL' && !asset.sharedUse ? { sharedUse: false } : {})
         }));
+    };
+
+    const handleSharedUseChange = (e) => {
+        setFormData((prev) => ({ ...prev, sharedUse: e.target.checked }));
     };
 
     const startEditing = () => {
@@ -229,17 +236,43 @@ const AssetDetailPage = () => {
     };
 
     const canEditStatus = () => {
-        return asset && asset.status === 'NORMAL';
+        return asset && ['NORMAL', 'ABNORMAL', 'UNUSED'].includes(asset.status);
     };
 
     const handleUpdate = async (e) => {
         e.preventDefault();
 
-        if (formData.status === 'DISPOSED' && asset.status === 'NORMAL') {
+        if (formData.status === 'UNUSED' && !formData.location?.trim()) {
+            setMessageModal({ isOpen: true, title: '비치장소 확인', message: '미사용 자산은 비치장소를 입력해 주세요.' });
+            return;
+        }
+        if (asset.status === 'UNUSED' && formData.status === 'NORMAL' && !formData.actualUserName?.trim()) {
+            setMessageModal({ isOpen: true, title: '실사용자 확인', message: '사용중으로 변경하려면 실사용자 이름을 입력해 주세요.' });
+            return;
+        }
+
+        if (formData.sharedUse && !asset.sharedUse && formData.status === 'NORMAL') {
+            setModalConfig({
+                isOpen: true,
+                title: '공용 자산으로 변경',
+                message: '현재 실사용자 정보는 변경 이력에 보관되고 자산의 현재 정보에서는 비워집니다. 자산 상태는 정상으로 유지됩니다. 계속하시겠습니까?',
+                type: 'confirm',
+                onConfirm: () => performUpdate()
+            });
+        } else if (formData.status === 'DISPOSED' && asset.status === 'NORMAL') {
             setModalConfig({
                 isOpen: true,
                 title: '폐기 처리 확인',
                 message: '자산을 폐기 처리하시겠습니까?\n폐기 후에는 상태를 되돌릴 수 없습니다.',
+                type: 'confirm',
+                onConfirm: () => performUpdate()
+            });
+        } else if (formData.status === 'UNUSED' && asset.status !== 'UNUSED'
+            && (asset.actualUserName || asset.actualUserDepartment || asset.actualUserContact)) {
+            setModalConfig({
+                isOpen: true,
+                title: '미사용 상태 변경 확인',
+                message: '미사용으로 변경하면 현재 실사용자 이름·부서·연락처가 지워집니다. 계속하시겠습니까?',
                 type: 'confirm',
                 onConfirm: () => performUpdate()
             });
@@ -342,7 +375,15 @@ const AssetDetailPage = () => {
             setMessageModal({
                 isOpen: true,
                 title: '알림',
-                message: '비정상 상태의 자산은 수정할 수 없습니다.'
+                message: '고장 상태의 자산은 삭제할 수 없습니다.'
+            });
+            return;
+        }
+        if (asset?.status === 'UNUSED') {
+            setMessageModal({
+                isOpen: true,
+                title: '알림',
+                message: '미사용 자산은 삭제할 수 없습니다.'
             });
             return;
         }
@@ -402,8 +443,8 @@ const AssetDetailPage = () => {
                                 <button className="btn-secondary" onClick={navigateToAssetList}>목록</button>
                                 <AssetRequestActions asset={asset} assetId={id} onSuccess={fetchAssetDetail} />
                                 <button
-                                    className={`btn-primary ${asset.status !== 'NORMAL' ? 'disabled-button' : ''}`}
-                                    onClick={() => handleRequestClick(startEditing)}
+                                    className={`btn-primary ${!canEditStatus() ? 'disabled-button' : ''}`}
+                                    onClick={() => canEditStatus() ? startEditing() : handleRequestClick(startEditing)}
                                 >
                                     수정
                                 </button>
@@ -517,8 +558,10 @@ const AssetDetailPage = () => {
                                                         value={formData.status || 'NORMAL'}
                                                         onChange={handleChange}
                                                     >
-                                                        <option value="NORMAL">정상</option>
-                                                        <option value="DISPOSED">폐기</option>
+                                                        <option value="NORMAL">정상/사용중</option>
+                                                        <option value="ABNORMAL">고장</option>
+                                                        <option value="UNUSED">미사용</option>
+                                                        {asset.status === 'NORMAL' && <option value="DISPOSED">폐기</option>}
                                                     </select>
                                                 ) : (
                                                     <div className="asset-static-field">
@@ -533,20 +576,59 @@ const AssetDetailPage = () => {
 
                                     <div className="form-section">
                                         <h3 className="form-section-title">실사용자 정보</h3>
-                                        <div className="form-grid">
-                                            <div className="form-group">
-                                                <label>사용자 이름</label>
-                                                <div className="asset-static-field">{formData.actualUserName || '-'}</div>
+                                        {asset.status === 'NORMAL' && formData.status === 'NORMAL' && !asset.sharedUse && (
+                                            <label className={`asset-shared-use-option ${formData.sharedUse ? 'selected' : ''}`}>
+                                                <input
+                                                    type="checkbox"
+                                                    checked={Boolean(formData.sharedUse)}
+                                                    onChange={handleSharedUseChange}
+                                                />
+                                                <span>
+                                                    <strong>공용 자산으로 변경</strong>
+                                                    <small>특정 실사용자 대신 여러 사람이 함께 사용하는 자산으로 표시합니다.</small>
+                                                </span>
+                                            </label>
+                                        )}
+                                        {formData.status === 'UNUSED' ? (
+                                            <p className="asset-status-help">미사용 자산은 비치장소만 관리하며 실사용자 정보는 비워집니다.</p>
+                                        ) : formData.sharedUse ? (
+                                            <p className="asset-status-help">
+                                                <span className="asset-usage-badge">공용</span>{' '}
+                                                {asset.sharedUse
+                                                    ? '특정 실사용자 없이 공용으로 사용하는 자산입니다.'
+                                                    : '저장 후 현재 실사용자 정보는 이력에 보관되고 공용 자산으로 변경됩니다.'}
+                                            </p>
+                                        ) : asset.status === 'UNUSED' && formData.status === 'NORMAL' ? (
+                                            <div className="form-grid">
+                                                <div className="form-group">
+                                                    <label>사용자 이름 <span className="required">*</span></label>
+                                                    <input type="text" name="actualUserName" className="form-input" value={formData.actualUserName || ''} onChange={handleChange} />
+                                                </div>
+                                                <div className="form-group">
+                                                    <label>사용자 부서</label>
+                                                    <input type="text" name="actualUserDepartment" className="form-input" value={formData.actualUserDepartment || ''} onChange={handleChange} />
+                                                </div>
+                                                <div className="form-group">
+                                                    <label>연락처</label>
+                                                    <input type="text" name="actualUserContact" className="form-input" value={formData.actualUserContact || ''} onChange={handleChange} />
+                                                </div>
                                             </div>
-                                            <div className="form-group">
-                                                <label>사용자 부서</label>
-                                                <div className="asset-static-field">{formData.actualUserDepartment || '-'}</div>
+                                        ) : (
+                                            <div className="form-grid">
+                                                <div className="form-group">
+                                                    <label>사용자 이름</label>
+                                                    <div className="asset-static-field">{formData.actualUserName || '-'}</div>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label>사용자 부서</label>
+                                                    <div className="asset-static-field">{formData.actualUserDepartment || '-'}</div>
+                                                </div>
+                                                <div className="form-group">
+                                                    <label>연락처</label>
+                                                    <div className="asset-static-field">{formData.actualUserContact || '-'}</div>
+                                                </div>
                                             </div>
-                                            <div className="form-group">
-                                                <label>연락처</label>
-                                                <div className="asset-static-field">{formData.actualUserContact || '-'}</div>
-                                            </div>
-                                        </div>
+                                        )}
                                     </div>
                                 </div>
 
@@ -578,9 +660,12 @@ const AssetDetailPage = () => {
                                             자산번호 {asset.assetNo || '-'} · 모델명 {asset.model || '-'}
                                         </p>
                                     </div>
-                                    <span className={`status-badge asset-summary-status ${getStatusClass(asset.status)}`}>
-                                        {getStatusLabel(asset.status)}
-                                    </span>
+                                    <div className="asset-summary-badges">
+                                        <span className={`status-badge asset-summary-status ${getStatusClass(asset.status)}`}>
+                                            {getStatusLabel(asset.status)}
+                                        </span>
+                                        {asset.sharedUse && <span className="asset-usage-badge">공용</span>}
+                                    </div>
                                 </div>
 
                                 {asset.status === 'LOST' && (
@@ -680,11 +765,20 @@ const AssetDetailPage = () => {
                                         </button>
                                     )}
                                 </div>
-                                <div className="asset-detail-list">
-                                    {renderDetailRow('사용자 이름', asset.actualUserName)}
-                                    {renderDetailRow('사용자 부서', asset.actualUserDepartment)}
-                                    {renderDetailRow('연락처', asset.actualUserContact)}
-                                </div>
+                                {asset.status === 'UNUSED' ? (
+                                    <p className="asset-status-help">현재 미사용 상태입니다. 실사용자 정보는 없으며 비치장소만 관리합니다.</p>
+                                ) : asset.sharedUse ? (
+                                    <div className="asset-detail-list">
+                                        {renderDetailRow('사용 구분', <span className="asset-usage-badge">공용</span>)}
+                                        {renderDetailRow('실사용자', '공용 사용')}
+                                    </div>
+                                ) : (
+                                    <div className="asset-detail-list">
+                                        {renderDetailRow('사용자 이름', asset.actualUserName)}
+                                        {renderDetailRow('사용자 부서', asset.actualUserDepartment)}
+                                        {renderDetailRow('연락처', asset.actualUserContact)}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </>

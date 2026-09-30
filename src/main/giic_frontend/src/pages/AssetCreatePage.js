@@ -190,6 +190,9 @@ const AssetCreatePage = () => {
         if (!formData.model) newErrors.model = '모델명은 필수입니다.';
         if (!formData.managingDept) newErrors.managingDept = '관리부서는 필수입니다.';
         if (!formData.purchaseDate) newErrors.purchaseDate = '취득일자는 필수입니다.';
+        if (formData.status === 'UNUSED' && !formData.location.trim()) {
+            newErrors.location = '미사용 자산은 비치장소를 입력해 주세요.';
+        }
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -464,10 +467,13 @@ const AssetCreatePage = () => {
                                 <div className="form-group">
                                     <label>상태</label>
                                     <select name="status" className="form-select" value={formData.status} onChange={handleChange}>
-                                        <option value="NORMAL">정상</option>
+                                        <option value="NORMAL">정상/사용중</option>
+                                        <option value="ABNORMAL">고장</option>
+                                        <option value="UNUSED">미사용</option>
                                         <option value="REPAIRING">수리 중</option>
                                         <option value="DISPOSED">폐기</option>
                                     </select>
+                                    {formData.status === 'UNUSED' && <p className="asset-status-help">미사용 자산은 비치장소가 필요하며 실사용자 정보는 저장하지 않습니다.</p>}
                                 </div>
                                 <div className="form-group">
                                     <label>
@@ -480,6 +486,7 @@ const AssetCreatePage = () => {
                                 <div className="form-group asset-create-span-two">
                                     <label>비치장소</label>
                                     <input type="text" name="location" className="form-input" value={formData.location} onChange={handleChange} />
+                                    {errors.location && <span className="error-message">{errors.location}</span>}
                                 </div>
                             </div>
                         </section>
@@ -492,15 +499,15 @@ const AssetCreatePage = () => {
                             <div className="form-grid asset-create-form-grid">
                                 <div className="form-group">
                                     <label>사용자 이름</label>
-                                    <input type="text" name="actualUserName" className="form-input" value={formData.actualUserName} onChange={handleChange} />
+                                    <input type="text" name="actualUserName" className="form-input" value={formData.actualUserName} onChange={handleChange} disabled={formData.status === 'UNUSED'} />
                                 </div>
                                 <div className="form-group">
                                     <label>사용자 부서</label>
-                                    <input type="text" name="actualUserDepartment" className="form-input" value={formData.actualUserDepartment} onChange={handleChange} />
+                                    <input type="text" name="actualUserDepartment" className="form-input" value={formData.actualUserDepartment} onChange={handleChange} disabled={formData.status === 'UNUSED'} />
                                 </div>
                                 <div className="form-group">
                                     <label>연락처</label>
-                                    <input type="text" name="actualUserContact" className="form-input" value={formData.actualUserContact} onChange={handleChange} />
+                                    <input type="text" name="actualUserContact" className="form-input" value={formData.actualUserContact} onChange={handleChange} disabled={formData.status === 'UNUSED'} />
                                 </div>
                             </div>
                         </section>

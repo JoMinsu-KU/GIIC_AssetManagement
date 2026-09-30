@@ -274,6 +274,36 @@ class TransferServiceTest {
     }
 
     @Test
+    void transferKeepsSharedUseForLocationOnlyAndClearsItForNewRecipient() {
+        Asset asset = assetWithManagementInformation();
+        asset.setSharedUse(true);
+        User requester = User.builder().employeeNo("2025009").name("Requester").build();
+        User approver = User.builder().employeeNo("2012067").name("Manager").build();
+        Transfer locationTransfer = Transfer.builder()
+                .id(20L).asset(asset).requestedBy(requester)
+                .recipientMode(TransferRecipientMode.KEEP)
+                .locationMode(TransferLocationMode.CHANGE)
+                .transferLocation("Shared Room")
+                .status(TransferStatus.PENDING).build();
+        Transfer userTransfer = Transfer.builder()
+                .id(21L).asset(asset).requestedBy(requester)
+                .recipientMode(TransferRecipientMode.CHANGE)
+                .recipientName("New User")
+                .locationMode(TransferLocationMode.KEEP)
+                .status(TransferStatus.PENDING).build();
+        when(transferRepository.findById(20L)).thenReturn(Optional.of(locationTransfer));
+        when(transferRepository.findById(21L)).thenReturn(Optional.of(userTransfer));
+
+        transferService.approveTransfer(20L, approver);
+        assertThat(asset.isSharedUse()).isTrue();
+        assertThat(asset.getActualUserName()).isNull();
+
+        transferService.approveTransfer(21L, approver);
+        assertThat(asset.isSharedUse()).isFalse();
+        assertThat(asset.getActualUserName()).isEqualTo("New User");
+    }
+
+    @Test
     void createTransferRejectsWhenRecipientAndLocationAreBothKept() {
         Asset asset = assetWithManagementInformation();
         User requester = User.builder()

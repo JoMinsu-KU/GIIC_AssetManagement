@@ -7,7 +7,8 @@ import MessageModal from '../common/MessageModal';
 
 const getBlockedMessage = (status) => {
     if (status === 'DISPOSED') return '폐기된 자산은 요청할 수 없습니다.';
-    if (status === 'ABNORMAL') return '비정상 상태의 자산은 요청할 수 없습니다.';
+    if (status === 'ABNORMAL') return '고장 상태의 자산은 요청할 수 없습니다.';
+    if (status === 'UNUSED') return '미사용 자산은 사용중으로 변경한 후 신청할 수 있습니다.';
     if (status === 'LOST') return '손망 처리된 자산은 요청할 수 없습니다.';
     return '현재 진행중인 요청이 있어 신규 요청이 불가능합니다.';
 };

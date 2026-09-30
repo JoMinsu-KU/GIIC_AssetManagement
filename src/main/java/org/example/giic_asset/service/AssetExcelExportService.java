@@ -125,7 +125,8 @@ public class AssetExcelExportService {
             case MANAGING_DEPT -> setText(cell, asset.getManagingDept(), styles.text());
             case LOCATION -> setText(cell, asset.getLocation(), styles.text());
             case STATUS -> setText(cell, getStatusLabel(asset.getStatus()), styles.center());
-            case ACTUAL_USER_NAME -> setText(cell, asset.getActualUserName(), styles.text());
+            case ACTUAL_USER_NAME -> setText(cell,
+                    asset.isSharedUse() ? "공용" : asset.getActualUserName(), styles.text());
             case ACTUAL_USER_DEPARTMENT -> setText(cell, asset.getActualUserDepartment(), styles.text());
             case ACTUAL_USER_CONTACT -> setText(cell, asset.getActualUserContact(), styles.text());
             case REGISTERED_BY_NAME -> setText(
@@ -211,7 +212,8 @@ public class AssetExcelExportService {
         }
         return switch (status) {
             case NORMAL -> "정상";
-            case ABNORMAL -> "비정상";
+            case ABNORMAL -> "고장";
+            case UNUSED -> "미사용";
             case DISPOSED -> "폐기";
             case REPAIRING -> "수리중";
             case TRANSFER_PENDING -> "이관 대기";

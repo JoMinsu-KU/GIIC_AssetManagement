@@ -18,6 +18,7 @@ public class AssetUpdateRequest {
     private String managingDept;
     private String location;
     private AssetStatus status;
+    private Boolean sharedUse;
 
     // === NEW FIELDS ===
     private String actualUserName;

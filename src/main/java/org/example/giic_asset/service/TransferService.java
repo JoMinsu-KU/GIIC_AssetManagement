@@ -247,6 +247,9 @@ public class TransferService {
                                 userDepartment,
                                 userContact,
                                 destinationLocation);
+                if (recipientMode != TransferRecipientMode.KEEP) {
+                        asset.setSharedUse(false);
+                }
                 log.info("Transfer approved. ID: {}", transferId);
 
                 notificationService.createNotification(

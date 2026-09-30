@@ -25,6 +25,7 @@ public class AssetRequest {
     private String location;
     @NotNull
     private AssetStatus status;
+    private Boolean sharedUse;
 
     // === NEW FIELDS ===
     private String actualUserName;
@@ -43,6 +44,7 @@ public class AssetRequest {
                 .managingDept(managingDept)
                 .location(location)
                 .status(status)
+                .sharedUse(Boolean.TRUE.equals(sharedUse))
                 .actualUserName(actualUserName)
                 .actualUserDepartment(actualUserDepartment)
                 .actualUserContact(actualUserContact)

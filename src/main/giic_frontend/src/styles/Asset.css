@@ -621,6 +621,18 @@
     color: #b91c1c;
 }
 
+.status-unused {
+    background-color: #e8eef5;
+    color: #475569;
+}
+
+.asset-status-help {
+    margin: 4px 0 0;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.6;
+}
+
 .status-disposed {
     background-color: #e2e8f0;
     color: #64748b;
@@ -816,6 +828,29 @@
 
 .asset-summary-status {
     flex-shrink: 0;
+}
+
+.asset-summary-badges {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.asset-usage-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 5px 10px;
+    border: 1px solid #cdddf6;
+    border-radius: 7px;
+    background: #edf4ff;
+    color: #315c9f;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 1.3;
+    white-space: nowrap;
 }
 
 .asset-summary-grid {
@@ -1257,6 +1292,47 @@
 .asset-edit-form {
     max-width: none;
     margin: 0;
+}
+
+.asset-shared-use-option {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    margin: 0 0 16px;
+    padding: 15px 17px;
+    border: 1px solid #dfe6f0;
+    border-radius: 12px;
+    background: #f8fafd;
+    cursor: pointer;
+}
+
+.asset-shared-use-option.selected {
+    border-color: #9bbcf2;
+    background: #edf4ff;
+}
+
+.asset-shared-use-option input {
+    width: 18px;
+    height: 18px;
+    margin: 2px 0 0;
+    accent-color: #477df0;
+}
+
+.asset-shared-use-option span {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.asset-shared-use-option strong {
+    color: var(--text-primary);
+    font-size: 14px;
+}
+
+.asset-shared-use-option small {
+    color: var(--text-secondary);
+    font-size: 12px;
+    line-height: 1.5;
 }
 
 .asset-edit-grid {

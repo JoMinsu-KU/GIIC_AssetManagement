@@ -32,12 +32,16 @@ public final class AssetSpecifications {
                     root.join("user", JoinType.LEFT).get("employeeNo"), safeCriteria.getUserId().trim()));
         }
         if (StringUtils.hasText(safeCriteria.getKeyword())) {
-            String pattern = likePattern(safeCriteria.getKeyword());
-            specification = specification.and((root, query, cb) -> cb.or(
-                    cb.like(cb.lower(root.get("assetNo")), pattern),
-                    cb.like(cb.lower(root.get("name")), pattern),
-                    cb.like(cb.lower(root.get("model")), pattern),
-                    cb.like(cb.lower(root.get("actualUserName")), pattern)));
+            if ("공용".equals(safeCriteria.getKeyword().trim())) {
+                specification = specification.and((root, query, cb) -> cb.isTrue(root.get("sharedUse")));
+            } else {
+                String pattern = likePattern(safeCriteria.getKeyword());
+                specification = specification.and((root, query, cb) -> cb.or(
+                        cb.like(cb.lower(root.get("assetNo")), pattern),
+                        cb.like(cb.lower(root.get("name")), pattern),
+                        cb.like(cb.lower(root.get("model")), pattern),
+                        cb.like(cb.lower(root.get("actualUserName")), pattern)));
+            }
         }
         if (StringUtils.hasText(safeCriteria.getAssetNo())) {
             specification = specification.and(containsIgnoreCase("assetNo", safeCriteria.getAssetNo()));

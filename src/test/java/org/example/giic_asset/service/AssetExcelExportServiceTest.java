@@ -121,6 +121,43 @@ class AssetExcelExportServiceTest {
         }
     }
 
+    @Test
+    void exportsFaultAndUnusedStatusLabels() throws Exception {
+        Asset broken = Asset.builder().assetNo("2409859").name("고장 자산")
+                .status(AssetStatus.ABNORMAL).build();
+        Asset unused = Asset.builder().assetNo("2502278").name("미사용 자산")
+                .status(AssetStatus.UNUSED).build();
+
+        when(assetRepository.findAll(anySpecification(), any(Sort.class)))
+                .thenReturn(List.of(broken, unused));
+
+        byte[] result = assetExcelExportService.export(
+                AssetSearchCriteria.empty(), List.of("assetNo", "status"));
+
+        try (XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(result))) {
+            var sheet = workbook.getSheetAt(0);
+            assertThat(sheet.getRow(1).getCell(1).getStringCellValue()).isEqualTo("고장");
+            assertThat(sheet.getRow(2).getCell(1).getStringCellValue()).isEqualTo("미사용");
+        }
+    }
+
+    @Test
+    void exportsSharedUseWithoutStoringItAsAnActualUser() throws Exception {
+        Asset shared = Asset.builder().assetNo("2405947").name("공용 자산")
+                .status(AssetStatus.NORMAL).sharedUse(true).build();
+        when(assetRepository.findAll(anySpecification(), any(Sort.class)))
+                .thenReturn(List.of(shared));
+
+        byte[] result = assetExcelExportService.export(
+                AssetSearchCriteria.empty(), List.of("assetNo", "actualUserName"));
+
+        try (XSSFWorkbook workbook = new XSSFWorkbook(new ByteArrayInputStream(result))) {
+            assertThat(workbook.getSheetAt(0).getRow(1).getCell(1).getStringCellValue())
+                    .isEqualTo("공용");
+        }
+        assertThat(shared.getActualUserName()).isNull();
+    }
+
     @SuppressWarnings("unchecked")
     private Specification<Asset> anySpecification() {
         return any(Specification.class);

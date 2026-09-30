@@ -54,7 +54,8 @@ const EMPTY_FILTERS = {
 
 const STATUS_LABELS = {
     NORMAL: '정상',
-    ABNORMAL: '비정상',
+    ABNORMAL: '고장',
+    UNUSED: '미사용',
     DISPOSED: '폐기',
     REPAIRING: '수리중',
     TRANSFER_PENDING: '이관 대기',
@@ -102,6 +103,7 @@ const formatDateTime = (value) => {
 
 const renderPreviewValue = (asset, key) => {
     const value = asset[key];
+    if (key === 'actualUserName' && asset.sharedUse) return '공용';
     if (key === 'value') return value === null || value === undefined ? '-' : `${Number(value).toLocaleString('ko-KR')}원`;
     if (key === 'purchaseDate') return formatDate(value);
     if (key === 'createdAt') return formatDateTime(value);
@@ -341,7 +343,8 @@ const AssetExportModal = ({ isOpen, onClose, initialFilters }) => {
                                 <select name="status" value={filters.status} onChange={handleFilterChange}>
                                     <option value="">전체 상태</option>
                                     <option value="NORMAL">정상</option>
-                                    <option value="ABNORMAL">비정상</option>
+                                    <option value="ABNORMAL">고장</option>
+                                    <option value="UNUSED">미사용</option>
                                     <option value="REPAIRING">수리중</option>
                                     <option value="TRANSFER_PENDING">이관 대기</option>
                                     <option value="DISPOSAL_PENDING">폐기 대기</option>
