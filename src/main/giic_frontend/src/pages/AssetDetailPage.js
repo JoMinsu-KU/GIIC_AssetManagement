@@ -5,6 +5,7 @@ import {
     addAssetImages,
     deleteAsset,
     deleteAssetImage,
+    getAssetCategories,
     getAssetDetail,
     getAssetImageUrl,
     setAssetPrimaryImage,
@@ -13,6 +14,7 @@ import {
 import { getAssetTransferHistory } from '../api/transfers';
 import AssetRequestActions from '../components/asset/AssetRequestActions';
 import AssetImageGallery from '../components/asset/AssetImageGallery';
+import AssetCategoryFields from '../components/asset/AssetCategoryFields';
 import TransferHistoryModal from '../components/transfer/TransferHistoryModal';
 import ConfirmModal from '../components/common/ConfirmModal';
 import MessageModal from '../components/common/MessageModal';
@@ -85,6 +87,7 @@ const AssetDetailPage = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [asset, setAsset] = useState(null);
     const [formData, setFormData] = useState({});
+    const [categories, setCategories] = useState([]);
     const [galleryImages, setGalleryImages] = useState([]);
     const [selectedImageKey, setSelectedImageKey] = useState(null);
     const [removedImageIds, setRemovedImageIds] = useState([]);
@@ -147,11 +150,18 @@ const AssetDetailPage = () => {
         fetchAssetDetail();
     }, [fetchAssetDetail]);
 
+    useEffect(() => {
+        getAssetCategories().then(setCategories).catch((error) => {
+            console.error('Failed to load asset categories:', error);
+        });
+    }, []);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData((prev) => ({
             ...prev,
             [name]: value,
+            ...(name === 'majorCategoryId' ? { categoryId: '' } : {}),
             ...(name === 'status' && value !== 'NORMAL' && !asset.sharedUse ? { sharedUse: false } : {})
         }));
     };
@@ -241,6 +251,11 @@ const AssetDetailPage = () => {
 
     const handleUpdate = async (e) => {
         e.preventDefault();
+
+        if (!formData.majorCategoryId || !formData.categoryId) {
+            setMessageModal({ isOpen: true, title: '분류 확인', message: '대분류와 중분류를 선택해 주세요.' });
+            return;
+        }
 
         if (formData.status === 'UNUSED' && !formData.location?.trim()) {
             setMessageModal({ isOpen: true, title: '비치장소 확인', message: '미사용 자산은 비치장소를 입력해 주세요.' });
@@ -521,6 +536,12 @@ const AssetDetailPage = () => {
                                                 <label>규격</label>
                                                 <input type="text" name="spec" className="form-input" value={formData.spec || ''} onChange={handleChange} />
                                             </div>
+                                            <AssetCategoryFields
+                                                categories={categories}
+                                                majorCategoryId={formData.majorCategoryId}
+                                                categoryId={formData.categoryId}
+                                                onChange={handleChange}
+                                            />
                                         </div>
                                     </div>
 
@@ -718,6 +739,8 @@ const AssetDetailPage = () => {
                                     {renderDetailRow('물품명', asset.name)}
                                     {renderDetailRow('모델명', asset.model)}
                                     {renderDetailRow('규격', asset.spec)}
+                                    {renderDetailRow('대분류', asset.majorCategory)}
+                                    {renderDetailRow('중분류', asset.subcategory)}
                                     {renderDetailRow('등록일', formatDate(asset.createdAt))}
                                 </div>
                             </div>

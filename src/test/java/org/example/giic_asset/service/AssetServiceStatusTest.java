@@ -42,6 +42,7 @@ class AssetServiceStatusTest {
     @Mock private DisposalRepository disposalRepository;
     @Mock private AssetLossRequestRepository assetLossRequestRepository;
     @Mock private NotificationRepository notificationRepository;
+    @Mock private AssetCategoryService categoryService;
     @InjectMocks private AssetService assetService;
 
     @Test

@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import DashboardLayout from '../components/layout/DashboardLayout';
-import { addAssetImages, createAsset, uploadAssetImage, ocrAssetImage } from '../api/assets';
+import { addAssetImages, createAsset, getAssetCategories, uploadAssetImage, ocrAssetImage } from '../api/assets';
+import AssetCategoryFields from '../components/asset/AssetCategoryFields';
 import '../styles/Asset.css';
 
 const MAX_ADDITIONAL_IMAGES = 4;
@@ -16,12 +17,15 @@ const AssetCreatePage = () => {
     const [additionalImages, setAdditionalImages] = useState([]);
     const [primaryImageKey, setPrimaryImageKey] = useState(null);
     const [autoFilledFields, setAutoFilledFields] = useState([]);
+    const [categories, setCategories] = useState([]);
 
     const [formData, setFormData] = useState({
         assetNo: '',
         name: '',
         model: '',
         spec: '',
+        majorCategoryId: '',
+        categoryId: '',
         value: '',
         purchaseDate: '',
         managingDept: '',
@@ -32,15 +36,25 @@ const AssetCreatePage = () => {
         actualUserContact: ''
     });
 
+    useEffect(() => {
+        getAssetCategories().then(setCategories).catch((error) => {
+            console.error('Failed to load asset categories:', error);
+        });
+    }, []);
+
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({
             ...prev,
-            [name]: value
+            [name]: value,
+            ...(name === 'majorCategoryId' ? { categoryId: '' } : {})
         }));
 
         if (errors[name]) {
             setErrors(prev => ({ ...prev, [name]: null }));
+        }
+        if (name === 'majorCategoryId') {
+            setErrors(prev => ({ ...prev, categoryId: null }));
         }
     };
 
@@ -187,6 +201,8 @@ const AssetCreatePage = () => {
         const newErrors = {};
         if (!formData.assetNo) newErrors.assetNo = '자산번호는 필수입니다.';
         if (!formData.name) newErrors.name = '물품명은 필수입니다.';
+        if (!formData.majorCategoryId) newErrors.majorCategoryId = '대분류를 선택해 주세요.';
+        if (!formData.categoryId) newErrors.categoryId = '중분류를 선택해 주세요.';
         if (!formData.model) newErrors.model = '모델명은 필수입니다.';
         if (!formData.managingDept) newErrors.managingDept = '관리부서는 필수입니다.';
         if (!formData.purchaseDate) newErrors.purchaseDate = '취득일자는 필수입니다.';
@@ -208,8 +224,10 @@ const AssetCreatePage = () => {
         try {
             const dataToSubmit = {
                 ...formData,
+                categoryId: Number(formData.categoryId),
                 value: formData.value ? parseInt(formData.value, 10) : 0
             };
+            delete dataToSubmit.majorCategoryId;
 
             const response = await createAsset(dataToSubmit);
             console.log('Create asset response:', response);
@@ -443,6 +461,13 @@ const AssetCreatePage = () => {
                                     </label>
                                     <input type="text" name="spec" className={getInputClassName('spec')} value={formData.spec} onChange={handleChange} />
                                 </div>
+                                <AssetCategoryFields
+                                    categories={categories}
+                                    majorCategoryId={formData.majorCategoryId}
+                                    categoryId={formData.categoryId}
+                                    onChange={handleChange}
+                                    errors={errors}
+                                />
                             </div>
                         </section>
 
@@ -536,7 +561,7 @@ const AssetCreatePage = () => {
                         <section className="detail-card asset-create-summary-card">
                             <h3 className="asset-create-summary-title">등록 체크</h3>
                             <div className="asset-create-summary-list">
-                                <div className="asset-create-summary-item"><span>필수 항목</span><strong>자산번호, 물품명, 모델명, 관리부서, 취득일자</strong></div>
+                                <div className="asset-create-summary-item"><span>필수 항목</span><strong>자산번호, 물품명, 분류, 모델명, 관리부서, 취득일자</strong></div>
                                 <div className="asset-create-summary-item"><span>전체 이미지</span><strong>{(imageFile ? 1 : 0) + additionalImages.length}장</strong></div>
                                 <div className="asset-create-summary-item"><span>대표 이미지</span><strong>{primaryImageKey === 'ocr' ? 'OCR 대상' : primaryImageKey ? '추가 사진' : '없음'}</strong></div>
                                 <div className="asset-create-summary-item"><span>추가 사진</span><strong>{additionalImages.length}장</strong></div>

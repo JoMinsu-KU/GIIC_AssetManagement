@@ -54,3 +54,5 @@ __pycache__/
 *.xls
 *.pdf
 DB/init/10_asset_migration.sql
+deliverables/
+src/main/resources/asset-category-assignments.tsv

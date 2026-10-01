@@ -21,6 +21,10 @@ public class AssetResponse {
     private String name;
     private String model;
     private String spec;
+    private Long categoryId;
+    private Long majorCategoryId;
+    private String majorCategory;
+    private String subcategory;
     private LocalDate purchaseDate;
     private Long value;
     private String managingDept;
@@ -64,6 +68,12 @@ public class AssetResponse {
                 .name(asset.getName())
                 .model(asset.getModel())
                 .spec(asset.getSpec())
+                .categoryId(asset.getCategory() == null ? null : asset.getCategory().getId())
+                .majorCategoryId(asset.getCategory() == null || asset.getCategory().getParent() == null
+                        ? null : asset.getCategory().getParent().getId())
+                .majorCategory(asset.getCategory() == null || asset.getCategory().getParent() == null
+                        ? null : asset.getCategory().getParent().getName())
+                .subcategory(asset.getCategory() == null ? null : asset.getCategory().getName())
                 .purchaseDate(asset.getPurchaseDate())
                 .value(asset.getValue())
                 .managingDept(asset.getManagingDept())

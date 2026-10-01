@@ -105,6 +105,11 @@ public class AssetExcelExportService {
         switch (column) {
             case ASSET_NO -> setText(cell, asset.getAssetNo(), styles.text());
             case NAME -> setText(cell, asset.getName(), styles.text());
+            case MAJOR_CATEGORY -> setText(cell,
+                    asset.getCategory() == null || asset.getCategory().getParent() == null
+                            ? null : asset.getCategory().getParent().getName(), styles.text());
+            case SUBCATEGORY -> setText(cell,
+                    asset.getCategory() == null ? null : asset.getCategory().getName(), styles.text());
             case MODEL -> setText(cell, asset.getModel(), styles.text());
             case SPEC -> setText(cell, asset.getSpec(), styles.text());
             case VALUE -> {

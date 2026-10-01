@@ -79,6 +79,11 @@ export const getAssetLocations = async () => {
     return Array.isArray(response.data) ? response.data : [];
 };
 
+export const getAssetCategories = async () => {
+    const response = await client.get('/assets/categories');
+    return Array.isArray(response.data) ? response.data : [];
+};
+
 export const createAsset = async (data) => {
     const response = await client.post('/assets', data);
     return response.data;

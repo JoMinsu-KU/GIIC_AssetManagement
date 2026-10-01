@@ -1,9 +1,28 @@
 name: ${COMPOSE_PROJECT_NAME:-giic_asset}
 
 services:
+  seed-check:
+    image: alpine:3.20
+    restart: "no"
+    volumes:
+      - ./current-data:/seed:ro
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        cd /seed
+        test -s database.sql
+        test -s uploads.tar.gz
+        test -s upload-files.sha256
+        test -s seed-id.txt
+        test -s seed-marker.sql
+        sha256sum -c SHA256SUMS.txt
+
   db:
     image: mysql:8.0
     restart: unless-stopped
+    depends_on:
+      seed-check:
+        condition: service_completed_successfully
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD is required}
       MYSQL_DATABASE: ${MYSQL_DATABASE:-asset_management}
@@ -18,20 +37,8 @@ services:
     volumes:
       - mysql-data:/var/lib/mysql
       - ./backups:/backups
-      - ../DB/init/01_schema.sql:/docker-entrypoint-initdb.d/01_schema.sql:ro
-      - ../DB/init/02_schema_update.sql:/docker-entrypoint-initdb.d/02_schema_update.sql:ro
-      - ../DB/init/03_transfer_update.sql:/docker-entrypoint-initdb.d/03_transfer_update.sql:ro
-      - ../DB/init/04_transfer_cleanup.sql:/docker-entrypoint-initdb.d/04_transfer_cleanup.sql:ro
-      - ../DB/init/05_asset_status_update.sql:/docker-entrypoint-initdb.d/05_asset_status_update.sql:ro
-      - ../DB/init/06_maintenance_type_update.sql:/docker-entrypoint-initdb.d/06_maintenance_type_update.sql:ro
-      - ../DB/init/07_asset_status_disposal_pending.sql:/docker-entrypoint-initdb.d/07_asset_status_disposal_pending.sql:ro
-      - ../DB/init/08_user_status_update.sql:/docker-entrypoint-initdb.d/08_user_status_update.sql:ro
-      - ../DB/init/09_notification_table.sql:/docker-entrypoint-initdb.d/09_notification_table.sql:ro
-      - ../DB/init/11_asset_status_lost.sql:/docker-entrypoint-initdb.d/11_asset_status_lost.sql:ro
-      - ../DB/init/12_asset_loss_requests.sql:/docker-entrypoint-initdb.d/12_asset_loss_requests.sql:ro
-      - ../DB/init/13_asset_loss_remarks.sql:/docker-entrypoint-initdb.d/13_asset_loss_remarks.sql:ro
-      - ../DB/init/14_transfer_location_required.sql:/docker-entrypoint-initdb.d/14_transfer_location_required.sql:ro
-      - ../DB/init/15_asset_status_unused.sql:/docker-entrypoint-initdb.d/15_asset_status_unused.sql:ro
+      - ./current-data/database.sql:/docker-entrypoint-initdb.d/00_database.sql:ro
+      - ./current-data/seed-marker.sql:/docker-entrypoint-initdb.d/01_seed_marker.sql:ro
     healthcheck:
       test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p\"$$MYSQL_ROOT_PASSWORD\" --silent"]
       interval: 10s
@@ -41,14 +48,67 @@ services:
     networks:
       - asset-network
 
+  db-verify:
+    image: mysql:8.0
+    restart: "no"
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD is required}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-asset_management}
+    volumes:
+      - ./current-data:/seed:ro
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        expected="$$(cat /seed/seed-id.txt)"
+        actual="$$(MYSQL_PWD="$$MYSQL_ROOT_PASSWORD" mysql -h db -uroot -N -s "$$MYSQL_DATABASE" -e 'SELECT seed_id FROM giic_migration_seed WHERE id = 1')"
+        if [ "$$actual" != "$$expected" ]; then
+          echo 'Database does not match this migration snapshot; existing data was not overwritten.' >&2
+          exit 1
+        fi
+    networks:
+      - asset-network
+
+  uploads-seed:
+    image: alpine:3.20
+    restart: "no"
+    depends_on:
+      seed-check:
+        condition: service_completed_successfully
+    volumes:
+      - uploads-data:/app/uploads
+      - ./current-data:/seed:ro
+    entrypoint: ["/bin/sh", "-ec"]
+    command:
+      - |
+        expected="$$(cat /seed/seed-id.txt)"
+        if [ -f /app/uploads/.giic-seed-id ]; then
+          test "$$(cat /app/uploads/.giic-seed-id)" = "$$expected"
+          exit 0
+        fi
+        if [ -n "$$(find /app/uploads -mindepth 1 -maxdepth 1 -print -quit)" ]; then
+          echo 'Upload volume is not empty; existing images were not overwritten.' >&2
+          exit 1
+        fi
+        tar -xzf /seed/uploads.tar.gz -C /app/uploads
+        cd /app/uploads
+        sha256sum -c /seed/upload-files.sha256 > /dev/null
+        test "$$(find . -type f | wc -l)" -eq "$$(wc -l < /seed/upload-files.sha256)"
+        chown -R 10001:10001 /app/uploads
+        printf '%s\n' "$$expected" > /app/uploads/.giic-seed-id
+
   backend:
     build:
       context: ..
       dockerfile: docker-deployment/Dockerfile.backend
     restart: unless-stopped
     depends_on:
-      db:
-        condition: service_healthy
+      db-verify:
+        condition: service_completed_successfully
+      uploads-seed:
+        condition: service_completed_successfully
     environment:
       TZ: Asia/Seoul
       SERVER_PORT: 9090

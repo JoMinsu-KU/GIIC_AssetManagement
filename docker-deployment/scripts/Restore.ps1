@@ -12,6 +12,9 @@ if (-not $ConfirmRestore) {
 }
 
 $packageRoot = Split-Path -Parent $PSScriptRoot
+if (Test-Path -LiteralPath (Join-Path $packageRoot 'current-data\seed-id.txt')) {
+    throw 'This migration package restores automatically on empty Docker volumes. Manual restore is disabled to avoid overwriting existing data.'
+}
 $envPath = Join-Path $packageRoot '.env'
 $composePath = Join-Path $packageRoot 'compose.yml'
 $resolvedBackup = (Resolve-Path -LiteralPath $BackupDirectory).Path

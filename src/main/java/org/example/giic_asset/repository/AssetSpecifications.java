@@ -55,6 +55,15 @@ public final class AssetSpecifications {
         if (StringUtils.hasText(safeCriteria.getLocation())) {
             specification = specification.and(containsIgnoreCase("location", safeCriteria.getLocation()));
         }
+        if (safeCriteria.getMajorCategoryId() != null) {
+            specification = specification.and((root, query, cb) -> cb.equal(
+                    root.join("category", JoinType.LEFT).join("parent", JoinType.LEFT).get("id"),
+                    safeCriteria.getMajorCategoryId()));
+        }
+        if (safeCriteria.getCategoryId() != null) {
+            specification = specification.and((root, query, cb) -> cb.equal(
+                    root.join("category", JoinType.LEFT).get("id"), safeCriteria.getCategoryId()));
+        }
         if (safeCriteria.getPurchaseDateFrom() != null) {
             specification = specification.and((root, query, cb) -> cb.greaterThanOrEqualTo(
                     root.get("purchaseDate"), safeCriteria.getPurchaseDateFrom()));

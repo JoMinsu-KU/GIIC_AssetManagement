@@ -52,6 +52,7 @@ public class AssetService {
             "image/jpeg", "image/jpg", "image/png", "image/webp");
 
     private final AssetRepository assetRepository;
+    private final AssetCategoryService categoryService;
     private final AssetUsageChangeHistoryRepository assetUsageChangeHistoryRepository;
     private final AssetImageRepository assetImageRepository;
     private final TransferRepository transferRepository;
@@ -76,7 +77,7 @@ public class AssetService {
             log.warn("Duplicate asset number: {}", request.getAssetNo());
             throw new BaseException(ErrorCode.DUPLICATE, "이미 존재하는 자산번호입니다.");
         }
-        Asset newAsset = request.toEntity(registrar);
+        Asset newAsset = request.toEntity(registrar, categoryService.requireActiveSubcategory(request.getCategoryId()));
         if (request.getStatus() == AssetStatus.UNUSED) {
             newAsset.updateActualUser(null, null, null);
             newAsset.setSharedUse(false);
@@ -203,6 +204,9 @@ public class AssetService {
         }
         asset.update(request.getName(), request.getModel(), request.getSpec(), request.getPurchaseDate(),
                 request.getValue(), request.getManagingDept(), request.getLocation(), request.getStatus());
+        if (request.getCategoryId() != null) {
+            asset.setCategory(categoryService.requireActiveSubcategory(request.getCategoryId()));
+        }
 
         if (nextStatus == AssetStatus.UNUSED) {
             asset.updateActualUser(null, null, null);

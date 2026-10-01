@@ -14,6 +14,8 @@ import java.util.Set;
 public enum AssetExportColumn {
     ASSET_NO("assetNo", "자산번호", 14),
     NAME("name", "물품명", 24),
+    MAJOR_CATEGORY("majorCategory", "대분류", 22),
+    SUBCATEGORY("subcategory", "중분류", 24),
     MODEL("model", "모델명", 24),
     SPEC("spec", "규격", 30),
     VALUE("value", "취득금액", 16),
@@ -30,6 +32,8 @@ public enum AssetExportColumn {
     private static final List<AssetExportColumn> DEFAULT_COLUMNS = List.of(
             ASSET_NO,
             NAME,
+            MAJOR_CATEGORY,
+            SUBCATEGORY,
             MODEL,
             SPEC,
             VALUE,

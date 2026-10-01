@@ -29,6 +29,10 @@ public class Asset extends BaseEntity {
 
     private String spec;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
+    private AssetCategory category;
+
     private LocalDate purchaseDate;
 
     private Long value;
@@ -185,6 +189,10 @@ public class Asset extends BaseEntity {
 
     public void setStatus(AssetStatus status) {
         this.status = status;
+    }
+
+    public void setCategory(AssetCategory category) {
+        this.category = category;
     }
 
     @Deprecated

@@ -1,9 +1,12 @@
 import React, { startTransition, useEffect, useRef, useState } from 'react';
 import { exportAssets, getAssetExportPreview } from '../api/assets';
+import { getSubcategories } from './asset/AssetCategoryFields';
 
 const COLUMN_DEFINITIONS = [
     { key: 'assetNo', label: '자산번호', width: 132 },
     { key: 'name', label: '물품명', width: 150 },
+    { key: 'majorCategory', label: '대분류', width: 150 },
+    { key: 'subcategory', label: '중분류', width: 150 },
     { key: 'model', label: '모델명', width: 150 },
     { key: 'spec', label: '규격', width: 180 },
     { key: 'value', label: '취득금액', width: 128 },
@@ -21,6 +24,8 @@ const COLUMN_DEFINITIONS = [
 const DEFAULT_COLUMNS = [
     'assetNo',
     'name',
+    'majorCategory',
+    'subcategory',
     'model',
     'spec',
     'value',
@@ -31,7 +36,7 @@ const DEFAULT_COLUMNS = [
 ];
 
 const COLUMN_PRESETS = [
-    { label: '기본', columns: ['assetNo', 'name', 'model', 'status'] },
+    { label: '기본', columns: ['assetNo', 'name', 'majorCategory', 'subcategory', 'model', 'status'] },
     { label: '재무', columns: ['assetNo', 'name', 'value', 'purchaseDate'] },
     { label: '관리', columns: ['assetNo', 'name', 'managingDept', 'location', 'actualUserName', 'status'] },
     { label: '전체', columns: COLUMN_DEFINITIONS.map(column => column.key) }
@@ -43,6 +48,8 @@ const EMPTY_FILTERS = {
     name: '',
     model: '',
     status: '',
+    majorCategoryId: '',
+    categoryId: '',
     dept: '',
     location: '',
     actualUserName: '',
@@ -69,6 +76,8 @@ const getInitialFilters = (initialFilters) => ({
     ...EMPTY_FILTERS,
     keyword: initialFilters?.keyword || '',
     status: initialFilters?.status || '',
+    majorCategoryId: initialFilters?.majorCategoryId || '',
+    categoryId: initialFilters?.categoryId || '',
     dept: initialFilters?.dept || '',
     location: initialFilters?.location || ''
 });
@@ -76,7 +85,7 @@ const getInitialFilters = (initialFilters) => ({
 const cleanFilters = (filters) => Object.entries(filters).reduce((result, [key, value]) => {
     if (value === '' || value === null || value === undefined) return result;
 
-    if (key === 'valueMin' || key === 'valueMax') {
+    if (key === 'valueMin' || key === 'valueMax' || key === 'majorCategoryId' || key === 'categoryId') {
         result[key] = Number(value);
     } else {
         result[key] = typeof value === 'string' ? value.trim() : value;
@@ -111,7 +120,7 @@ const renderPreviewValue = (asset, key) => {
     return value || '-';
 };
 
-const AssetExportModal = ({ isOpen, onClose, initialFilters }) => {
+const AssetExportModal = ({ isOpen, onClose, initialFilters, categories = [] }) => {
     const latestPreviewRequestId = useRef(0);
     const previewLoadedRef = useRef(false);
     const [selectedColumns, setSelectedColumns] = useState(DEFAULT_COLUMNS);
@@ -124,6 +133,8 @@ const AssetExportModal = ({ isOpen, onClose, initialFilters }) => {
 
     const listKeyword = initialFilters?.keyword || '';
     const listStatus = initialFilters?.status || '';
+    const listMajorCategoryId = initialFilters?.majorCategoryId || '';
+    const listCategoryId = initialFilters?.categoryId || '';
     const listDept = initialFilters?.dept || '';
     const listLocation = initialFilters?.location || '';
 
@@ -133,6 +144,8 @@ const AssetExportModal = ({ isOpen, onClose, initialFilters }) => {
         setFilters(getInitialFilters({
             keyword: listKeyword,
             status: listStatus,
+            majorCategoryId: listMajorCategoryId,
+            categoryId: listCategoryId,
             dept: listDept,
             location: listLocation
         }));
@@ -140,7 +153,7 @@ const AssetExportModal = ({ isOpen, onClose, initialFilters }) => {
         setTotalElements(0);
         previewLoadedRef.current = false;
         setErrorMessage('');
-    }, [isOpen, listKeyword, listStatus, listDept, listLocation]);
+    }, [isOpen, listKeyword, listStatus, listMajorCategoryId, listCategoryId, listDept, listLocation]);
 
     useEffect(() => {
         if (!isOpen) return undefined;
@@ -215,7 +228,11 @@ const AssetExportModal = ({ isOpen, onClose, initialFilters }) => {
 
     const handleFilterChange = (event) => {
         const { name, value } = event.target;
-        setFilters(current => ({ ...current, [name]: value }));
+        setFilters(current => ({
+            ...current,
+            [name]: value,
+            ...(name === 'majorCategoryId' ? { categoryId: '' } : {})
+        }));
     };
 
     const handleDownload = async () => {
@@ -357,6 +374,22 @@ const AssetExportModal = ({ isOpen, onClose, initialFilters }) => {
                             <label className="asset-export-field">
                                 <span>관리부서</span>
                                 <input name="dept" value={filters.dept} onChange={handleFilterChange} placeholder="부서명" />
+                            </label>
+                            <label className="asset-export-field">
+                                <span>대분류</span>
+                                <select name="majorCategoryId" value={filters.majorCategoryId} onChange={handleFilterChange}>
+                                    <option value="">전체 대분류</option>
+                                    {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+                                </select>
+                            </label>
+                            <label className="asset-export-field">
+                                <span>중분류</span>
+                                <select name="categoryId" value={filters.categoryId} onChange={handleFilterChange} disabled={!filters.majorCategoryId}>
+                                    <option value="">전체 중분류</option>
+                                    {getSubcategories(categories, filters.majorCategoryId).map((category) => (
+                                        <option key={category.id} value={category.id}>{category.name}</option>
+                                    ))}
+                                </select>
                             </label>
                             <label className="asset-export-field">
                                 <span>자산번호</span>

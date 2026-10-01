@@ -4,7 +4,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import LoginPage from './pages/LoginPage';
 import SignupPage from './pages/SignupPage';
 import MainPage from './pages/MainPage';
-import PlaceholderPage from './pages/PlaceholderPage';
+import SystemSettingsPage from './pages/SystemSettingsPage';
 import UserListPage from './pages/UserListPage';
 import AssetListPage from './pages/AssetListPage';
 import AssetCreatePage from './pages/AssetCreatePage';
@@ -80,8 +80,8 @@ function App() {
           } />
 
           <Route path="/settings" element={
-            <ProtectedRoute>
-              <PlaceholderPage title="시스템 설정" />
+            <ProtectedRoute requiredRole="SUPER">
+              <SystemSettingsPage />
             </ProtectedRoute>
           } />
 

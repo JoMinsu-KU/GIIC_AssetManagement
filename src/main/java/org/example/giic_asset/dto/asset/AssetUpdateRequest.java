@@ -13,6 +13,7 @@ public class AssetUpdateRequest {
     private String name;
     private String model;
     private String spec;
+    private Long categoryId;
     private Long value;
     private java.time.LocalDate purchaseDate;
     private String managingDept;

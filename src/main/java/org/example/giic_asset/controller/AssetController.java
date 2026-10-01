@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.giic_asset.common.dto.ApiResponse;
 import org.example.giic_asset.common.dto.PageResponse;
 import org.example.giic_asset.dto.asset.AssetExportRequest;
+import org.example.giic_asset.dto.asset.AssetCategoryResponse;
 import org.example.giic_asset.dto.asset.AssetImageResponse;
 import org.example.giic_asset.dto.asset.AssetRequest;
 import org.example.giic_asset.dto.asset.AssetResponse;
@@ -16,6 +17,7 @@ import org.example.giic_asset.dto.ocr.OcrResponse;
 import org.example.giic_asset.entity.enums.AssetStatus;
 import org.example.giic_asset.security.CustomUserDetails;
 import org.example.giic_asset.service.AssetService;
+import org.example.giic_asset.service.AssetCategoryService;
 import org.example.giic_asset.service.AssetExcelExportService;
 import org.example.giic_asset.service.GeminiOcrService;
 import org.springframework.data.domain.Page;
@@ -46,6 +48,7 @@ import lombok.extern.slf4j.Slf4j;
 public class AssetController {
 
     private final AssetService assetService;
+    private final AssetCategoryService categoryService;
     private final AssetExcelExportService assetExcelExportService;
     private final GeminiOcrService geminiOcrService;
 
@@ -70,6 +73,8 @@ public class AssetController {
             @RequestParam(required = false) String name,
             @RequestParam(required = false) String model,
             @RequestParam(required = false) String location,
+            @RequestParam(required = false) Long majorCategoryId,
+            @RequestParam(required = false) Long categoryId,
             @RequestParam(required = false)
             @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate purchaseDateFrom,
             @RequestParam(required = false)
@@ -91,6 +96,8 @@ public class AssetController {
                     .name(name)
                     .model(model)
                     .location(location)
+                    .majorCategoryId(majorCategoryId)
+                    .categoryId(categoryId)
                     .purchaseDateFrom(purchaseDateFrom)
                     .purchaseDateTo(purchaseDateTo)
                     .valueMin(valueMin)
@@ -132,6 +139,11 @@ public class AssetController {
     @GetMapping("/locations")
     public ApiResponse<List<String>> getAssetLocations() {
         return ApiResponse.success(assetService.getDistinctLocations());
+    }
+
+    @GetMapping("/categories")
+    public ApiResponse<List<AssetCategoryResponse>> getAssetCategories() {
+        return ApiResponse.success(categoryService.getTree());
     }
 
     @GetMapping("/{assetId}")

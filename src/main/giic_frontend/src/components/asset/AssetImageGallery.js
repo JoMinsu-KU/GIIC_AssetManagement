@@ -46,7 +46,7 @@ const AssetImageGallery = ({
                 <span className="asset-gallery-mode">{editing ? '수정 모드' : `${images.length}장`}</span>
             </div>
 
-            <div className="asset-gallery-layout">
+            <div className={`asset-gallery-layout ${!editing && images.length === 0 ? 'asset-gallery-layout-empty' : ''}`}>
                 <div className="asset-gallery-thumbnails" aria-label="자산 이미지 목록">
                     {images.map((image, index) => (
                         <div className="asset-gallery-thumb-wrap" key={image.key}>

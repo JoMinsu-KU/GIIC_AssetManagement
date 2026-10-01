@@ -2,6 +2,7 @@ package org.example.giic_asset.controller;
 
 import org.example.giic_asset.common.exception.GlobalExceptionHandler;
 import org.example.giic_asset.service.AuthService;
+import org.example.giic_asset.service.ClientIpResolver;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -26,7 +27,7 @@ class AuthControllerValidationTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = standaloneSetup(new AuthController(authService))
+        mockMvc = standaloneSetup(new AuthController(authService, new ClientIpResolver()))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }

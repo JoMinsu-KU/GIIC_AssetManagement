@@ -32,9 +32,10 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final NotificationService notificationService;
     private final ApplicationEventPublisher eventPublisher;
+    private final UserAccessService userAccessService;
 
-    @Transactional(readOnly = true)
-    public TokenResponse login(LoginRequest request) {
+    @Transactional
+    public TokenResponse login(LoginRequest request, String ipAddress) {
         log.info("AuthService.login() called for employeeNo: {}", request.getEmployeeNo());
 
         User user = userRepository.findByEmployeeNo(request.getEmployeeNo())
@@ -49,6 +50,8 @@ public class AuthService {
         }
 
         validateApprovedUser(user, request.getEmployeeNo());
+
+        userAccessService.recordLogin(user.getEmployeeNo(), ipAddress);
 
         String accessToken = jwtTokenProvider.createAccessToken(user.getEmployeeNo(), user.getRole());
         String refreshToken = jwtTokenProvider.createRefreshToken(user.getEmployeeNo());

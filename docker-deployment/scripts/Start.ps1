@@ -9,7 +9,10 @@ $envPath = Join-Path $packageRoot '.env'
 $composePath = Join-Path $packageRoot 'compose.yml'
 
 if (-not (Test-Path -LiteralPath $envPath)) {
-    & (Join-Path $PSScriptRoot 'Initialize-Environment.ps1')
+    throw 'Migration .env is missing. Copy the complete package; do not generate new credentials.'
+}
+if (-not (Test-Path -LiteralPath (Join-Path $packageRoot 'current-data\SHA256SUMS.txt'))) {
+    throw 'Migration snapshot is missing. Copy the complete current-data directory.'
 }
 
 $envText = Get-Content -Raw -LiteralPath $envPath

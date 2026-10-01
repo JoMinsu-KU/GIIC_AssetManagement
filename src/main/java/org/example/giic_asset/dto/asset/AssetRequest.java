@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.example.giic_asset.entity.Asset;
+import org.example.giic_asset.entity.AssetCategory;
 import org.example.giic_asset.entity.User;
 import org.example.giic_asset.entity.enums.AssetStatus;
 
@@ -19,6 +20,8 @@ public class AssetRequest {
     private String name;
     private String model;
     private String spec;
+    @NotNull
+    private Long categoryId;
     private LocalDate purchaseDate;
     private Long value;
     private String managingDept;
@@ -33,12 +36,13 @@ public class AssetRequest {
     private String actualUserContact;
     // registeredBy will be set from SecurityContext
 
-    public Asset toEntity(User registrar) {
+    public Asset toEntity(User registrar, AssetCategory category) {
         return Asset.builder()
                 .assetNo(assetNo)
                 .name(name)
                 .model(model)
                 .spec(spec)
+                .category(category)
                 .purchaseDate(purchaseDate)
                 .value(value)
                 .managingDept(managingDept)

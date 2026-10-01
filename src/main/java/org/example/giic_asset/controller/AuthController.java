@@ -1,6 +1,7 @@
 package org.example.giic_asset.controller;
 
 import jakarta.validation.Valid;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.giic_asset.common.dto.ApiResponse;
@@ -9,6 +10,7 @@ import org.example.giic_asset.dto.auth.RefreshTokenRequest;
 import org.example.giic_asset.dto.auth.TokenResponse;
 import org.example.giic_asset.dto.user.SignupRequest;
 import org.example.giic_asset.service.AuthService;
+import org.example.giic_asset.service.ClientIpResolver;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -23,12 +25,14 @@ import org.springframework.web.bind.annotation.RestController;
 public class AuthController {
 
     private final AuthService authService;
+    private final ClientIpResolver clientIpResolver;
 
     @PostMapping("/login")
-    public ApiResponse<TokenResponse> login(@RequestBody @Valid LoginRequest request) {
+    public ApiResponse<TokenResponse> login(@RequestBody @Valid LoginRequest request,
+                                            HttpServletRequest servletRequest) {
         log.info("========== POST /api/auth/login ==========");
         log.info("Login request for employeeNo: {}", request.getEmployeeNo());
-        TokenResponse response = authService.login(request);
+        TokenResponse response = authService.login(request, clientIpResolver.resolve(servletRequest));
         log.info("Login successful for user: {}, role: {}", response.getName(), response.getRole());
         return ApiResponse.success(response);
     }

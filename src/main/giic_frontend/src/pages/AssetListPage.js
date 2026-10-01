@@ -3,12 +3,15 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useCallback, useRef } from 'react';
 import DashboardLayout from '../components/layout/DashboardLayout';
 import AssetExportModal from '../components/AssetExportModal';
-import { getAssets, getAssetImageUrl } from '../api/assets';
+import { getAssets, getAssetCategories, getAssetImageUrl } from '../api/assets';
+import { getSubcategories } from '../components/asset/AssetCategoryFields';
 import '../styles/Asset.css';
 
 const DEFAULT_FILTERS = {
     keyword: '',
     status: '',
+    majorCategoryId: '',
+    categoryId: '',
     dept: '',
     location: ''
 };
@@ -23,6 +26,8 @@ const getPageFromSearchParams = (searchParams) => {
 const getFiltersFromSearchParams = (searchParams) => ({
     keyword: searchParams.get('keyword') || '',
     status: searchParams.get('status') || '',
+    majorCategoryId: searchParams.get('majorCategoryId') || '',
+    categoryId: searchParams.get('categoryId') || '',
     dept: searchParams.get('dept') || '',
     location: searchParams.get('location') || ''
 });
@@ -32,6 +37,8 @@ const buildListSearchParams = (page, filters) => {
     if (page > 0) params.set('page', String(page + 1));
     if (filters.keyword.trim()) params.set('keyword', filters.keyword.trim());
     if (filters.status) params.set('status', filters.status);
+    if (filters.majorCategoryId) params.set('majorCategoryId', filters.majorCategoryId);
+    if (filters.categoryId) params.set('categoryId', filters.categoryId);
     if (filters.dept.trim()) params.set('dept', filters.dept.trim());
     if (filters.location.trim()) params.set('location', filters.location.trim());
     return params;
@@ -40,6 +47,8 @@ const buildListSearchParams = (page, filters) => {
 const areFiltersEqual = (left, right) => (
     left.keyword === right.keyword
     && left.status === right.status
+    && left.majorCategoryId === right.majorCategoryId
+    && left.categoryId === right.categoryId
     && left.dept === right.dept
     && left.location === right.location
 );
@@ -58,6 +67,7 @@ const AssetListPage = () => {
     const lastScheduledFiltersRef = useRef(initialFiltersRef.current);
     const initialLoadCompletedRef = useRef(false);
     const [assets, setAssets] = useState([]);
+    const [categories, setCategories] = useState([]);
     const [loading, setLoading] = useState(true);
     const [pageInfo, setPageInfo] = useState({
         total_elements: 0,
@@ -68,6 +78,12 @@ const AssetListPage = () => {
 
     const [filters, setFilters] = useState(initialFiltersRef.current);
     const [isExportModalOpen, setIsExportModalOpen] = useState(false);
+
+    useEffect(() => {
+        getAssetCategories().then(setCategories).catch((error) => {
+            console.error('Failed to load asset categories:', error);
+        });
+    }, []);
 
     const getStatusLabel = (status) => {
         const labels = {
@@ -111,6 +127,8 @@ const AssetListPage = () => {
                 size: PAGE_SIZE,
                 keyword: activeFilters.keyword.trim(),
                 status: activeFilters.status,
+                majorCategoryId: activeFilters.majorCategoryId,
+                categoryId: activeFilters.categoryId,
                 dept: activeFilters.dept.trim(),
                 location: activeFilters.location.trim()
             };
@@ -182,7 +200,8 @@ const AssetListPage = () => {
         const { name, value } = e.target;
         setFilters(prev => ({
             ...prev,
-            [name]: value
+            [name]: value,
+            ...(name === 'majorCategoryId' ? { categoryId: '' } : {})
         }));
     };
 
@@ -292,6 +311,22 @@ const AssetListPage = () => {
                             />
                         </div>
                         <div className="filter-group asset-list-filter-group">
+                            <label className="filter-label">대분류</label>
+                            <select name="majorCategoryId" className="form-select asset-list-select" value={filters.majorCategoryId} onChange={handleFilterChange}>
+                                <option value="">전체 대분류</option>
+                                {categories.map((category) => <option key={category.id} value={category.id}>{category.name}</option>)}
+                            </select>
+                        </div>
+                        <div className="filter-group asset-list-filter-group">
+                            <label className="filter-label">중분류</label>
+                            <select name="categoryId" className="form-select asset-list-select" value={filters.categoryId} onChange={handleFilterChange} disabled={!filters.majorCategoryId}>
+                                <option value="">전체 중분류</option>
+                                {getSubcategories(categories, filters.majorCategoryId).map((category) => (
+                                    <option key={category.id} value={category.id}>{category.name}</option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="filter-group asset-list-filter-group">
                             <label className="filter-label">비치 장소</label>
                             <input
                                 type="text"
@@ -390,6 +425,7 @@ const AssetListPage = () => {
                                             </td>
                                             <td>
                                                 <span className="asset-list-asset-name">{asset.name}</span>
+                                                <span className="asset-list-category">{[asset.majorCategory, asset.subcategory].filter(Boolean).join(' / ') || '-'}</span>
                                             </td>
                                             <td title={asset.model || ''}>
                                                 <span className="asset-list-clamped-text">{asset.model || '-'}</span>
@@ -468,6 +504,7 @@ const AssetListPage = () => {
                     isOpen={isExportModalOpen}
                     onClose={handleCloseExportModal}
                     initialFilters={filters}
+                    categories={categories}
                 />
             </div>
         </DashboardLayout>

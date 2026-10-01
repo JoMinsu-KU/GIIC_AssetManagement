@@ -3,6 +3,12 @@ package org.example.giic_asset.common.interceptor;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
+import lombok.RequiredArgsConstructor;
+import org.example.giic_asset.security.CustomUserDetails;
+import org.example.giic_asset.service.ClientIpResolver;
+import org.example.giic_asset.service.UserAccessService;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -11,7 +17,11 @@ import java.util.UUID;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class LoggingInterceptor implements HandlerInterceptor {
+
+    private final UserAccessService userAccessService;
+    private final ClientIpResolver clientIpResolver;
 
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler)
@@ -28,6 +38,15 @@ public class LoggingInterceptor implements HandlerInterceptor {
         }
         log.info("[{}] Authorization: {}", requestId,
                 request.getHeader("Authorization") != null ? "[PRESENT]" : "[ABSENT]");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails user) {
+            try {
+                userAccessService.recordActivity(user.getUsername(), clientIpResolver.resolve(request));
+            } catch (RuntimeException exception) {
+                log.warn("Unable to record user activity for {}", user.getUsername(), exception);
+            }
+        }
 
         return true;
     }

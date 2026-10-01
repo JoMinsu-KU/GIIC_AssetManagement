@@ -24,6 +24,6 @@ public interface AssetRepository extends JpaRepository<Asset, Long>, JpaSpecific
     List<String> findDistinctLocations();
 
     @Override
-    @EntityGraph(attributePaths = "registeredBy")
+    @EntityGraph(attributePaths = {"registeredBy", "category", "category.parent"})
     Page<Asset> findAll(Specification<Asset> specification, Pageable pageable);
 }

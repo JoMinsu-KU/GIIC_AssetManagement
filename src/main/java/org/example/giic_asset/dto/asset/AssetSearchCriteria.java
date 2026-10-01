@@ -22,6 +22,8 @@ public class AssetSearchCriteria {
     private String name;
     private String model;
     private String location;
+    private Long majorCategoryId;
+    private Long categoryId;
     private LocalDate purchaseDateFrom;
     private LocalDate purchaseDateTo;
     private Long valueMin;

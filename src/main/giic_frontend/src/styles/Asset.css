@@ -1512,7 +1512,7 @@
 
 .asset-list-filter-grid {
     display: grid;
-    grid-template-columns: minmax(230px, 1.5fr) minmax(140px, 0.8fr) repeat(2, minmax(170px, 1fr)) auto;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
     gap: 16px;
     align-items: end;
 }
@@ -1687,6 +1687,28 @@
 .asset-list-asset-name {
     font-weight: 700;
     color: #19253d;
+}
+
+.asset-list-category {
+    display: block;
+    margin-top: 5px;
+    color: #71809a;
+    font-size: 11px;
+    line-height: 1.35;
+}
+
+.asset-category-contact {
+    grid-column: 1 / -1;
+    margin: -2px 0 0;
+    color: #64738a;
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.asset-category-contact a {
+    color: #3766da;
+    font-weight: 700;
+    text-decoration: underline;
 }
 
 .asset-list-thumbnail {
@@ -2702,21 +2724,7 @@
 /* Asset multi-image gallery */
 .asset-detail-hero {
     grid-template-columns: minmax(0, 1.15fr) minmax(480px, 0.85fr);
-    align-items: stretch;
-}
-
-.asset-detail-summary-card,
-.asset-detail-hero > .asset-image-card {
-    height: 100%;
-}
-
-.asset-detail-summary-card {
-    display: flex;
-    flex-direction: column;
-}
-
-.asset-detail-summary-card .asset-summary-grid {
-    margin-top: auto;
+    align-items: start;
 }
 
 .asset-image-card {
@@ -2768,6 +2776,14 @@
     grid-template-columns: 76px minmax(0, 1fr);
     gap: 12px;
     min-width: 0;
+}
+
+.asset-gallery-layout-empty {
+    grid-template-columns: minmax(0, 1fr);
+}
+
+.asset-gallery-layout-empty .asset-gallery-thumbnails {
+    display: none;
 }
 
 .asset-gallery-thumbnails {
