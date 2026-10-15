@@ -27,7 +27,7 @@ class AuthControllerValidationTest {
 
     @BeforeEach
     void setUp() {
-        mockMvc = standaloneSetup(new AuthController(authService, new ClientIpResolver()))
+        mockMvc = standaloneSetup(new AuthController(authService, new ClientIpResolver(false)))
                 .setControllerAdvice(new GlobalExceptionHandler())
                 .build();
     }

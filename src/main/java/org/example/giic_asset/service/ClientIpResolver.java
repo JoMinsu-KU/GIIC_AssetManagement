@@ -1,18 +1,46 @@
 package org.example.giic_asset.service;
 
 import jakarta.servlet.http.HttpServletRequest;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
 @Component
 public class ClientIpResolver {
+    private final boolean hostProxyEnabled;
+
+    public ClientIpResolver(@Value("${app.client-ip.host-proxy-enabled:false}") boolean hostProxyEnabled) {
+        this.hostProxyEnabled = hostProxyEnabled;
+    }
+
     public String resolve(HttpServletRequest request) {
         String remote = request.getRemoteAddr();
-        String forwarded = request.getHeader("X-Real-IP");
-        if (isDockerProxy(remote) && forwarded != null && forwarded.length() <= 45
-                && forwarded.matches("[0-9a-fA-F:.]+")) {
-            return isDockerGateway(forwarded, remote) ? null : forwarded;
+        if (isDockerProxy(remote)) {
+            String forwarded = request.getHeader("X-Real-IP");
+            if (!isValidIp(forwarded)) return null;
+            return !hostProxyEnabled && isDockerGateway(forwarded, remote) ? null : forwarded;
         }
-        return isDockerGateway(remote, remote) ? null : remote;
+        return isValidIp(remote) ? remote : null;
+    }
+
+    private boolean isValidIp(String address) {
+        if (address == null || address.length() > 45) return false;
+        if (address.contains(":")) {
+            if (!address.matches("[0-9a-fA-F:.]+")) return false;
+            try {
+                InetAddress.getByName(address);
+                return true;
+            } catch (UnknownHostException exception) {
+                return false;
+            }
+        }
+        if (!address.matches("[0-9]{1,3}(\\.[0-9]{1,3}){3}")) return false;
+        for (String part : address.split("\\.")) {
+            if (Integer.parseInt(part) > 255) return false;
+        }
+        return true;
     }
 
     private boolean isDockerGateway(String candidate, String peer) {
@@ -28,7 +56,7 @@ public class ClientIpResolver {
     private boolean isDockerProxy(String address) {
         if (address == null) return false;
         String[] parts = address.split("\\.");
-        if (parts.length != 4 || !"172".equals(parts[0])) return false;
+        if (parts.length != 4 || !"172".equals(parts[0]) || !isValidIp(address)) return false;
         try {
             int second = Integer.parseInt(parts[1]);
             return second >= 16 && second <= 31;

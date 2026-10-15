@@ -34,6 +34,18 @@ docker compose --env-file .env -f compose.yml logs seed-check db-verify uploads-
 
 프론트엔드는 Nginx의 `/api`, `/uploads`를 사용하므로 워크스테이션 IP가 달라져도 API 주소를 다시 빌드하지 않아도 됩니다. 패키지의 `APP_PUBLIC_URL`은 우선 `http://localhost:3000`입니다. **다른 PC에서 열 수 있는 이메일 링크를 보내기 전에는** `.env`의 `APP_PUBLIC_URL`을 새 PC의 IP 또는 도메인으로 바꾸고 백엔드를 재생성하세요. 외부 접속이 필요하면 Windows 방화벽의 TCP 3000을 허용 대상 네트워크에만 개방하세요. DB와 백엔드 포트는 기본적으로 `127.0.0.1`에만 바인딩됩니다.
 
+## 실제 접속 IP 기록
+
+Windows Docker Desktop의 공개 포트에서는 컨테이너가 Windows로 들어온 TCP 연결의 원래 IP 대신 Docker 게이트웨이 주소를 볼 수 있습니다. `scripts/Enable-RealClientIp.ps1`은 Windows에서 Caddy를 실행해 공개 포트 3000을 직접 받고, Docker Nginx를 `127.0.0.1:3001`로 옮깁니다. Caddy가 직접 연결한 상대 IP를 새 헤더로 설정하고, Nginx가 이를 백엔드로 전달합니다. 외부 요청에 실린 임의의 IP 헤더는 Caddy에서 덮어씁니다.
+
+```powershell
+powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\scripts\Enable-RealClientIp.ps1
+```
+
+스크립트는 공식 Caddy 릴리스의 SHA-512를 검증하고, 현재 사용자의 로그온 시 시작하는 `GIIC Asset Host Proxy` 작업을 등록합니다. 백엔드를 먼저 빌드한 뒤 `.env`를 백업하고 컨테이너를 재생성합니다. 중간에 실패하면 기존 `.env`와 공개 포트 설정을 복원합니다. 완료 후 `http://localhost:3000/healthz`가 `ok`를 반환해야 합니다. 로그온 세션이 없으면 이 사용자 작업도 실행되지 않으므로, 상시 운영 서버에서는 Windows 서비스로 등록하는 것이 좋습니다.
+
+대시보드의 IP는 이 Windows PC에 **직접 연결한 장치의 주소**입니다. 앞단에 기관 프록시·VPN·NAT가 있으면 그 장치의 주소가 기록될 수 있으며, 별도의 신뢰 프록시 구성이 필요합니다. 이전에 게이트웨이 주소로 기록된 로그인 기록은 소급해서 복원할 수 없습니다.
+
 ## 데이터 안전
 
 - 이 패키지는 실시간 복제가 아닌 **스냅샷**입니다. 내보낸 뒤 기존 서버에 새로 들어온 변경은 포함되지 않습니다. 최종 전환 직전에 기존 서버의 쓰기를 중단하고 스냅샷을 다시 준비해야 그 시점까지의 변경을 모두 옮길 수 있습니다.

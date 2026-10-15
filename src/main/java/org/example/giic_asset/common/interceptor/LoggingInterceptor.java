@@ -30,7 +30,7 @@ public class LoggingInterceptor implements HandlerInterceptor {
         request.setAttribute("requestId", requestId);
 
         log.info("[{}] Request: {} {} from {}", requestId, request.getMethod(), request.getRequestURI(),
-                request.getRemoteAddr());
+                clientIpResolver.resolve(request));
 
         // Additional logging details
         if (request.getQueryString() != null) {

@@ -4,6 +4,8 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
+import org.example.giic_asset.service.ClientIpResolver;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -14,11 +16,13 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Component
+@RequiredArgsConstructor
 public class RateLimitFilter extends OncePerRequestFilter {
 
     private static final int MAX_REQUESTS = 20;
     private static final long WINDOW_MILLIS = 60_000L;
 
+    private final ClientIpResolver clientIpResolver;
     private final Map<String, RequestWindow> requestWindows = new ConcurrentHashMap<>();
 
     @Override
@@ -60,11 +64,8 @@ public class RateLimitFilter extends OncePerRequestFilter {
     }
 
     private String clientKey(HttpServletRequest request) {
-        String forwardedFor = request.getHeader("X-Forwarded-For");
-        if (forwardedFor != null && !forwardedFor.isBlank()) {
-            return forwardedFor.split(",")[0].trim();
-        }
-        return request.getRemoteAddr();
+        String resolved = clientIpResolver.resolve(request);
+        return resolved == null ? request.getRemoteAddr() : resolved;
     }
 
     private static class RequestWindow {

@@ -48,4 +48,30 @@ finally {
 
 $portLine = Get-Content -LiteralPath $envPath | Where-Object { $_ -match '^FRONTEND_PORT=' } | Select-Object -First 1
 $frontendPort = if ($portLine) { ($portLine -split '=', 2)[1].Trim() } else { '3000' }
-Write-Host "GIIC Asset Management: http://localhost:$frontendPort"
+$proxyLine = Get-Content -LiteralPath $envPath | Where-Object { $_ -match '^APP_CLIENT_IP_HOST_PROXY_ENABLED=' } | Select-Object -First 1
+$hostProxyEnabled = $proxyLine -and ($proxyLine -split '=', 2)[1].Trim() -eq 'true'
+if ($hostProxyEnabled) {
+    $proxyHealthy = $false
+    try {
+        $proxyHealthy = (Invoke-WebRequest -Uri 'http://127.0.0.1:3000/healthz' -TimeoutSec 2 -UseBasicParsing).StatusCode -eq 200
+    } catch { }
+    if (-not $proxyHealthy) {
+        $proxyTask = Get-ScheduledTask -TaskName 'GIIC Asset Host Proxy' -ErrorAction SilentlyContinue
+        if (-not $proxyTask) {
+            throw 'The Windows host proxy is not installed. Run Enable-RealClientIp.ps1.'
+        }
+        Start-ScheduledTask -TaskName 'GIIC Asset Host Proxy'
+        for ($attempt = 0; $attempt -lt 10; $attempt++) {
+            Start-Sleep -Seconds 1
+            try {
+                $proxyHealthy = (Invoke-WebRequest -Uri 'http://127.0.0.1:3000/healthz' -TimeoutSec 2 -UseBasicParsing).StatusCode -eq 200
+                if ($proxyHealthy) { break }
+            } catch { }
+        }
+        if (-not $proxyHealthy) { throw 'The Windows host proxy did not start.' }
+    }
+    Write-Host 'GIIC Asset Management: http://localhost:3000 (Windows host proxy)'
+}
+else {
+    Write-Host "GIIC Asset Management: http://localhost:$frontendPort"
+}
